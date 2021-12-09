@@ -1,0 +1,25 @@
+clone
+add   .
+commit
+push
+pull
+status
+
+
+ssh-keygen -t rsa -b 4096 -C "os2nlinux@gmail.com"
+
+
+git clone git@github.com:ldumaguing/RPi-6502nZ80.git
+
+
+
+git add .
+git commit -m "bla"
+git push
+
+
+name: Babych Diana Vasilevna 
+city: Kharkiv
+country: Ukraine
+
+
