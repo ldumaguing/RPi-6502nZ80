@@ -1,0 +1,53 @@
+   69  sudo apt install i2c-tools
+   70  i2cdetect -l
+   71  i2cdetect -y -r l
+   72  i2cdetect -y -r 1
+   73  i2cdetect -y -r 2
+   74  i2cdetect -y -r 1
+   75  i2cdetect -l
+   76  i2cdetect -y -r 1
+   77  i2cdetect -y -r 2
+   78  i2cdetect -y -r 1
+   79  i2cdetect -l
+  203  i2cdeteck -l
+  204  i2cdetect -l
+  205  i2cdetect -y -r 1
+  206  i2cdetect -y -r 2
+  207  i2cdetect -y -r 1
+  208  i2cdump 1 0x38
+  209  i2cdump 1 0x38 b
+  210  i2cdump -y 1 0x38 b
+  211  i2cget -y 1 0x38 0x00
+  212  i2cget -y 1 0x38 0x01
+  213  i2cget -y 1 0x38 0x02
+  214  i2cdump -y 1 0x38 b
+  215  i2cdump -y 1 0x38 
+  216  i2cdump -y 1 0x38 b
+  217  i2cdump -y 1 0x38 a
+  218  i2cdump -y 1 0x38 b
+  219  i2cget -y 1 0x38 0
+  220  i2cget -y 1 0x38 1
+  221  i2cget -y 1 0x38 2
+  222  i2cget -y 1 0x38 3
+  223  i2cget -y 1 0x38 4
+  224  i2cget -y 1 0x38 5
+  225  i2cget -y 1 0x38 6
+  226  i2cget -y 1 0x38 7
+  227  i2cget -y 1 0x38 8
+  228  i2cget -y 1 0x38 9
+  229  i2cget -y 1 0x38 0xea
+  230  i2cdump -y 1 0x38 b
+  231  i2cget -y 1 0x38 0xea
+  232  find /sys/class/i2c-adapter/
+  233  find /sys/class/i2c-dev
+  234  i2cget -y 1 0x38 0xff
+  235  i2cget -y 1 0x38 0x0
+  236  i2cget -y 1 0x38 0x1
+  237  i2cget -y 1 0x38 0x11
+  275  i2cdetect 
+  276  i2cdetect -l
+  277  i2cdetect -y -r l
+  278  i2cdetect -y -r 
+  279  i2cdetect -y -q
+  280  history | grep i2c
+  281  history | grep i2c > history.txt
