@@ -52,13 +52,13 @@ int main(void)
       perror("Error writing to /sys/class/gpio/gpio26/value");
       exit(1);
     }
-    usleep(50000);
+    usleep(50000 * 2);
 
     if (write(fd, "0", 1) != 1) {
       perror("Error writing to /sys/class/gpio/gpio26/value");
       exit(1);
     }
-    usleep(50000);
+    usleep(50000 * 2);
   } while (ch != 27);
 
   close(fd);

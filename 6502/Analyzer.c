@@ -7,11 +7,16 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
+
+#include<linux/i2c.h>
+#include<linux/i2c-dev.h>
+#include <termios.h>
+#include<sys/ioctl.h>
 
 void export_Addresses ( int * );
 void set_direction ( int * );
 void unexport_Addresses ( int * );
+int printDBus();
 
 // **************************************************************************************
 int main ( void ) {
@@ -65,13 +70,10 @@ int main ( void ) {
                 return ( -1 );
             }
             address = ( address << 1 ) + atoi ( value_str );
-            // printf(" %d", atoi(value_str));
+
             close ( fd );
         }
         printf ( "%04x", address );
-
-
-
 
         sprintf ( buff, "/sys/class/gpio/gpio%d/value", GPIOs[16] );
         fd = open ( buff, O_RDONLY );
@@ -86,11 +88,7 @@ int main ( void ) {
         printf ( ": %s", atoi ( value_str ) ? "r" : "W" );
         close ( fd );
 
-
-
-
-
-
+        if (printDBus() == -1) return -1;
 
         printf ( "\n" );
         usleep ( 5000 );
@@ -108,6 +106,32 @@ int main ( void ) {
     while ( read ( STDIN_FILENO, &ch, 1 ) ==1 );
     tcsetattr ( STDIN_FILENO, TCSANOW, &orig_term );
 
+    return 0;
+}
+
+// **************************************************************************************
+int printDBus() {
+    int file;
+
+    if((file=open("/dev/i2c-1", O_RDWR)) < 0) {
+        perror("failed to open the bus\n");
+        return -1;
+    }
+    if(ioctl(file, I2C_SLAVE, 0x38) < 0) {
+        perror("Failed to connect to the sensor\n");
+        return -1;
+    }
+
+    int BUFFER_SIZE = 5;
+    char buf[BUFFER_SIZE];
+    if(read(file, buf, BUFFER_SIZE)!=BUFFER_SIZE) {
+        perror("Failed to read in the buffer\n");
+        return -1;
+    }
+
+    printf(" %02x", buf[0]);
+
+    close(file);
     return 0;
 }
 
@@ -170,15 +194,6 @@ void unexport_Addresses ( int *GPIOs ) {
             exit ( 1 );
         }
     }
-
-
-
-
-
-
-
-
-
 
     close ( fd );
 }
