@@ -21,12 +21,20 @@ void export_Addresses ( int * );
 void set_direction_Addresses ( int * );
 void unexport_Addresses ( int * );
 
-void print_current_address ( int * );
-void print_RW ( int * );
+int print_current_address ( int * );
+int print_RW ( int * );
 void printDBus();
 
 // **************************************************************************************
 int main ( void ) {
+    const int startingAddr = 60138;
+
+    FILE *fp;
+    char MEMORY[32768];
+    fp = fopen ( "rom.bin", "rb" );
+    fread ( MEMORY, 32768, 1, fp );
+    fclose ( fp );
+
     int GPIOs[17] = {
         22, 27, 17,  4, 14, 15, 18, 23,  // a15 to a8
         24, 25,  8,  7, 12, 16, 20, 21,  // a7 to a0
@@ -64,12 +72,8 @@ int main ( void ) {
     do {
         int len = read ( STDIN_FILENO, &ch, 1 );
         if ( len == 1 ) {
-            //  printf ( "You pressed char 0x%02x : %c\n", ch,
-            //           ( ch >= 32 && ch < 127 ) ? ch : ' ' );
-
             if ( ch == 'p' ) pause++;
             else pause = 0;
-
         }
 
         if ( pause % 2 ) continue;
@@ -84,13 +88,20 @@ int main ( void ) {
             perror ( "Error writing to /sys/class/gpio/gpio26/value" );
             exit ( 1 );
         }
-        usleep ( 50000 * 2 );
+        usleep ( 50000 * 3 );
 
-	printf("%6d ", counter);
-	counter++;
+        printf ( "%6d ", counter );
+        counter++;
         // *****
-        print_current_address ( GPIOs );
-        print_RW ( GPIOs );
+        int addr = print_current_address ( GPIOs );
+        addr -= startingAddr;
+        if ( print_RW ( GPIOs ) ) {
+            // write
+            printf ( "W" );
+        } else {
+            // read
+            printf ( "r" );
+        }
         printDBus();
         // *****
 
@@ -98,7 +109,7 @@ int main ( void ) {
             perror ( "Error writing to /sys/class/gpio/gpio26/value" );
             exit ( 1 );
         }
-        usleep ( 50000 * 2 );
+        usleep ( 50000 * 3 );
 // ********************
 
 
@@ -186,7 +197,7 @@ void unexport_CLK() {
 }
 
 // **************************************************************************************
-void print_current_address ( int *GPIOs ) {
+int print_current_address ( int *GPIOs ) {
     char value_str[3];
     int fd;
     char buff[256];
@@ -208,9 +219,10 @@ void print_current_address ( int *GPIOs ) {
         close ( fd );
     }
     printf ( "%04x", address );
+    return address;
 }
 
-void print_RW ( int *GPIOs ) {
+int print_RW ( int *GPIOs ) {
     char value_str[3];
     int fd;
     char buff[256];
@@ -225,8 +237,9 @@ void print_RW ( int *GPIOs ) {
         fprintf ( stderr, "Failed to read value!\n" );
         exit ( 1 );
     }
-    printf ( ": %s", atoi ( value_str ) ? "r" : "W" );
+    // printf ( ": %s", atoi ( value_str ) ? "r" : "W" );
     close ( fd );
+    return ( atoi ( value_str ) ? 0 : 1 );
 }
 
 void printDBus() {
