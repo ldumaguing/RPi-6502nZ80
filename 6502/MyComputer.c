@@ -78,27 +78,29 @@ int main ( void ) {
 
 
 
-
+// ********************
         if ( write ( fd, "1", 1 ) != 1 ) {
             perror ( "Error writing to /sys/class/gpio/gpio26/value" );
             exit ( 1 );
         }
         usleep ( 50000 * 2 );
 
+        // *****
         print_current_address ( GPIOs );
         print_RW ( GPIOs );
         printDBus();
+        // *****
 
         if ( write ( fd, "0", 1 ) != 1 ) {
             perror ( "Error writing to /sys/class/gpio/gpio26/value" );
             exit ( 1 );
         }
         usleep ( 50000 * 2 );
+// ********************
 
 
 
-
-
+        if ( ch == 'p' ) pause++;
 
 
 
