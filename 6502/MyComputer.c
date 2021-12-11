@@ -96,7 +96,6 @@ int main ( void ) {
         usleep ( 50000 * 2 );
 
 
-        if ( ch == 'p' ) pause++;
 
 
 
