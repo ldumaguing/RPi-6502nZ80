@@ -17,9 +17,14 @@ void export_Addresses ( int * );
 void set_direction_Addresses ( int * );
 void unexport_Addresses ( int * );
 
-void print_current_address ( int * );
-void print_RW ( int * );
+void loadROM ( char * );
+
+int get_current_address ( int * );
+int get_RW ( int * );
 void printDBus();
+
+void mode_Read ( char *, char *, int, int );
+void mode_Write ( char *, int );
 
 int isAnalyzer = 0;
 
@@ -30,6 +35,14 @@ int main ( void ) {
         24, 25,  8,  7, 12, 16, 20, 21,  // a7 to a0
         19                               // RW
     };
+
+    int RAM_size = 32768;    // 0000 to 7fff
+    char RAM[RAM_size];
+
+    int ROM_size = 32768;    // 8000 to ffff
+    char ROM[ROM_size];
+    int ROM_start_addr = 65536 - ROM_size;
+    loadROM ( ROM );
 
     struct termios orig_term, raw_term;
     tcgetattr ( STDIN_FILENO, &orig_term );
@@ -53,6 +66,7 @@ int main ( void ) {
 
     char ch = 0;
     int counter = 0;
+    int address = 0;
     do {
         read ( STDIN_FILENO, &ch, 1 );
 
@@ -65,15 +79,23 @@ int main ( void ) {
 
 
 // ********************
-        usleep ( 50000 );
+        usleep ( 5000 );
 
         // *****
         printf ( "%6d ", counter );
         counter++;
 
-        print_current_address ( GPIOs );
-        print_RW ( GPIOs );
-        printDBus();
+
+        if ( get_RW ( GPIOs ) ) {
+            // ***** Read
+            address = get_current_address ( GPIOs );
+            mode_Read ( RAM, ROM, ROM_start_addr, address );
+        } else {
+            // ***** Write
+            address = get_current_address ( GPIOs );
+            mode_Write ( RAM, address );
+        }
+        //printDBus();
 // ********************
 
 
@@ -108,7 +130,85 @@ int main ( void ) {
 }
 
 // **************************************************************************************
-void print_current_address ( int *GPIOs ) {
+void mode_Read ( char *ram, char *rom, int romAddr0, int currAddr ) {
+    int file;
+    if ( ( file=open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
+        perror ( "failed to open the bus\n" );
+        return;
+    }
+    if ( ioctl ( file, I2C_SLAVE, 0x38 ) < 0 ) {
+        perror ( "Failed to connect to the sensor\n" );
+        return;
+    }
+
+
+
+
+    char writeBuffer[1];
+    if ( currAddr < 32768 ) { // RAM
+        printf ( " RAM: %02x", ram[currAddr] );
+        writeBuffer[0] = ( char ) rom[currAddr];
+        if ( write ( file, writeBuffer, 1 ) != 1 )
+            perror ( "Failed to write to PCF\n" );
+    } else {                  // ROM
+        printf ( " ROM: %02x", rom[currAddr - romAddr0] );
+        writeBuffer[0] = ( char ) rom[currAddr - romAddr0];
+        if ( write ( file, writeBuffer, 1 ) != 1 )
+            perror ( "Failed to write to PCF\n" );
+    }
+
+
+
+
+
+    close ( file );
+}
+
+void mode_Write ( char *ram, int currAddr ) {
+    int file;
+    if ( ( file=open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
+        perror ( "failed to open the bus\n" );
+        return;
+    }
+    if ( ioctl ( file, I2C_SLAVE, 0x38 ) < 0 ) {
+        perror ( "Failed to connect to the sensor\n" );
+        return;
+    }
+
+    printf ( "x\n" );
+
+
+
+    char buf[5];
+    if ( read ( file, buf, 5 ) != 5 ) {
+        perror ( "Failed to read in the buffer\n" );
+        return;
+    }
+
+    if ( currAddr < 32768 ) {
+
+        ram[currAddr] = buf[0];
+        printf ( ".%02x.%02x.%02x", currAddr, ram[currAddr], buf[0] );
+    }
+
+
+
+
+
+
+
+    close ( file );
+}
+
+void loadROM ( char *rom ) {
+    FILE *fp;
+    fp = fopen ( "rom.bin", "rb" );
+    fread ( rom, 32768, 1, fp );
+    fclose ( fp );
+}
+
+// **************************************************************************************
+int get_current_address ( int *GPIOs ) {
     char value_str[3];
     int fd;
     char buff[256];
@@ -130,9 +230,11 @@ void print_current_address ( int *GPIOs ) {
         close ( fd );
     }
     printf ( "%04x", address );
+
+    return address;
 }
 
-void print_RW ( int *GPIOs ) {
+int get_RW ( int *GPIOs ) {
     char value_str[3];
     int fd;
     char buff[256];
@@ -149,6 +251,7 @@ void print_RW ( int *GPIOs ) {
     }
     printf ( ": %s", atoi ( value_str ) ? "r" : "W" );
     close ( fd );
+    return ( atoi ( value_str ) ? 1 : 0 );
 }
 
 void printDBus() {
@@ -165,7 +268,7 @@ void printDBus() {
 
     int BUFFER_SIZE = 5;
     char buf[BUFFER_SIZE];
-    if ( read ( file, buf, BUFFER_SIZE ) !=BUFFER_SIZE ) {
+    if ( read ( file, buf, BUFFER_SIZE ) != BUFFER_SIZE ) {
         perror ( "Failed to read in the buffer\n" );
         exit ( 1 );
     }

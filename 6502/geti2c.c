@@ -29,7 +29,7 @@ int main() {
     }
 
     char buf[BUFFER_SIZE];
-    if(read(file, buf, BUFFER_SIZE)!=BUFFER_SIZE) {
+    if(read(file, buf, BUFFER_SIZE) != BUFFER_SIZE) {
         perror("Failed to read in the buffer\n");
         return 1;
     }
