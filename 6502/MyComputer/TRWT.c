@@ -126,7 +126,14 @@ void mode_Write ( char *ram, int currAddr ) {
     usleep ( 50000 * 5 );
 
 
-
+    if ( ( fi2c = open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
+        perror ( "failed to open the bus\n" );
+        return;
+    }
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x38 ) < 0 ) {
+        perror ( "Failed to connect to the sensor\n" );
+        return;
+    }
     if ( read ( fi2c, buf, 5 ) != 5 ) {
         perror ( "Failed to read in the buffer\n" );
         return;
@@ -205,79 +212,41 @@ int main ( void ) {
     }
     char ch = 0;
     int tiktoc = 0;
-    int prev = 0;
-    int counter = 0;
+    int currRW = 0;
     int address = 0;
     do {
         int len = read ( STDIN_FILENO, &ch, 1 );
-        if ( len == 1 ) {
-            if ( ch == 't' ) {
-                if ( tiktoc )
-                    tiktoc = 0;
-                else
-                    tiktoc = 1;
-            }
+        currRW = get_RW ( GPIOs );
+
+        if ( write ( fd, "0", 1 ) != 1 ) {
+            perror ( "Error writing to /sys/class/gpio/gpio26/value" );
+            exit ( 1 );
         }
+        usleep ( 50000 );
 
-        if ( tiktoc == 0 ) {
-            if ( prev == 0 ) {
-                printf ( "Tic: " );
-                prev = 1;
-                if ( write ( fd, "1", 1 ) != 1 ) {
-                    perror ( "Error writing to /sys/class/gpio/gpio26/value" );
-                    exit ( 1 );
-                }
-
-                if ( get_RW ( GPIOs ) ) {
-                    // ***** Read
-                    address = get_current_address ( GPIOs );
-                    mode_Read ( RAM, ROM, ROM_start_addr, address );
-                } else {
-                    // ***** Write
-                    address = get_current_address ( GPIOs );
-                    mode_Write ( RAM, address );
-                }
-                printf ( "\n" );
-            }
-
+        if ( currRW ) {
+            // ***** Read
+            address = get_current_address ( GPIOs );
+            mode_Read ( RAM, ROM, ROM_start_addr, address );
         } else {
-            if ( prev == 1 ) {
-                printf ( "Toc: " );
-                prev = 0;
-                if ( write ( fd, "0", 1 ) != 1 ) {
-                    perror ( "Error writing to /sys/class/gpio/gpio26/value" );
-                    exit ( 1 );
-                }
-                if ( get_RW ( GPIOs ) ) {
-                    // ***** Read
-                    address = get_current_address ( GPIOs );
-                    mode_Read ( RAM, ROM, ROM_start_addr, address );
-                } else {
-                    // ***** Write
-                    address = get_current_address ( GPIOs );
-                    mode_Write ( RAM, address );
-                }
-                printf ( "\n" );
-            }
+            // ***** Write
+            address = get_current_address ( GPIOs );
+            mode_Write ( RAM, address );
         }
 
-
-        // ********************
-        // printf ( "%6d ", counter );
-        // counter++;
-
-        // print_current_address ( GPIOs );
-        // print_RW ( GPIOs );
-        // printDBus();
-        // ********************
+        if ( write ( fd, "1", 1 ) != 1 ) {
+            perror ( "Error writing to /sys/class/gpio/gpio26/value" );
+            exit ( 1 );
+        }
+        usleep ( 50000 );
 
 
 
 
 
+        printf ( "\n" );
 
 
-        // usleep ( 50000 * 2 );
 
         /*
               // ********************
@@ -420,14 +389,27 @@ void print_RW ( int *GPIOs ) {
 }
 
 void printDBus() {
+    int file;
+
+    if ( ( file=open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
+        perror ( "failed to open the bus\n" );
+        exit ( 1 );
+    }
+    if ( ioctl ( file, I2C_SLAVE, 0x38 ) < 0 ) {
+        perror ( "Failed to connect to the sensor\n" );
+        exit ( 1 );
+    }
+
     int BUFFER_SIZE = 5;
     char buf[BUFFER_SIZE];
-    if ( read ( fi2c, buf, BUFFER_SIZE ) !=BUFFER_SIZE ) {
+    if ( read ( file, buf, BUFFER_SIZE ) !=BUFFER_SIZE ) {
         perror ( "Failed to read in the buffer\n" );
         exit ( 1 );
     }
 
     printf ( " %02x", buf[0] );
+
+    close ( file );
 }
 
 
@@ -495,6 +477,7 @@ void unexport_Addresses ( int *GPIOs ) {
 
     close ( fd );
 }
+
 
 
 
