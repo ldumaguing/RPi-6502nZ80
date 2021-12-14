@@ -214,7 +214,7 @@ int main ( void ) {
             mode_Write ( RAM, address );
         }
         printf ( "%s: %04x\n", currRW ? "r":"W", get_current_address ( GPIOs ) );
-        usleep ( 50000 * 20 );
+        // usleep ( 50000 * 20 );
 
 
 
@@ -238,7 +238,7 @@ int main ( void ) {
             mode_Write ( RAM, address );
         }
         printf ( "%s: %04x\n", currRW ? "r":"W", get_current_address ( GPIOs ) );
-        usleep ( 50000 * 20 );
+        // usleep ( 50000 * 20 );
 
 
 
