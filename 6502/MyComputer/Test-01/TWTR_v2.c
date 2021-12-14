@@ -126,10 +126,7 @@ void mode_Write ( char *ram, int currAddr ) {
     usleep ( 50000 * 5 );
 
 
-    if ( ( fi2c = open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
-        perror ( "failed to open the bus\n" );
-        return;
-    }
+
     if ( ioctl ( fi2c, I2C_SLAVE, 0x38 ) < 0 ) {
         perror ( "Failed to connect to the sensor\n" );
         return;
@@ -218,20 +215,8 @@ int main ( void ) {
         int len = read ( STDIN_FILENO, &ch, 1 );
         currRW = get_RW ( GPIOs );
 
+
         if ( write ( fd, "0", 1 ) != 1 ) {
-            perror ( "Error writing to /sys/class/gpio/gpio26/value" );
-            exit ( 1 );
-        }
-        if ( currRW == 1 ) {
-            // ***** Read
-            address = get_current_address ( GPIOs );
-            mode_Read ( RAM, ROM, ROM_start_addr, address );
-        }
-        usleep ( 50000 );
-
-
-
-        if ( write ( fd, "1", 1 ) != 1 ) {
             perror ( "Error writing to /sys/class/gpio/gpio26/value" );
             exit ( 1 );
         }
@@ -243,8 +228,16 @@ int main ( void ) {
         usleep ( 50000 );
 
 
-
-
+        if ( write ( fd, "1", 1 ) != 1 ) {
+            perror ( "Error writing to /sys/class/gpio/gpio26/value" );
+            exit ( 1 );
+        }
+        if ( currRW == 1 ) {
+            // ***** Read
+            address = get_current_address ( GPIOs );
+            mode_Read ( RAM, ROM, ROM_start_addr, address );
+        }
+        usleep ( 50000 );
 
 
 
@@ -396,27 +389,19 @@ void print_RW ( int *GPIOs ) {
 }
 
 void printDBus() {
-    int file;
-
-    if ( ( file=open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
-        perror ( "failed to open the bus\n" );
-        exit ( 1 );
-    }
-    if ( ioctl ( file, I2C_SLAVE, 0x38 ) < 0 ) {
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x38 ) < 0 ) {
         perror ( "Failed to connect to the sensor\n" );
         exit ( 1 );
     }
 
     int BUFFER_SIZE = 5;
     char buf[BUFFER_SIZE];
-    if ( read ( file, buf, BUFFER_SIZE ) !=BUFFER_SIZE ) {
+    if ( read ( fi2c, buf, BUFFER_SIZE ) !=BUFFER_SIZE ) {
         perror ( "Failed to read in the buffer\n" );
         exit ( 1 );
     }
 
     printf ( " %02x", buf[0] );
-
-    close ( file );
 }
 
 

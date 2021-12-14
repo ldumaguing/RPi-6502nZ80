@@ -126,10 +126,7 @@ void mode_Write ( char *ram, int currAddr ) {
     usleep ( 50000 * 5 );
 
 
-    if ( ( fi2c = open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
-        perror ( "failed to open the bus\n" );
-        return;
-    }
+
     if ( ioctl ( fi2c, I2C_SLAVE, 0x38 ) < 0 ) {
         perror ( "Failed to connect to the sensor\n" );
         return;
@@ -399,27 +396,20 @@ void print_RW ( int *GPIOs ) {
 }
 
 void printDBus() {
-    int file;
-
-    if ( ( file=open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
-        perror ( "failed to open the bus\n" );
-        exit ( 1 );
-    }
-    if ( ioctl ( file, I2C_SLAVE, 0x38 ) < 0 ) {
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x38 ) < 0 ) {
         perror ( "Failed to connect to the sensor\n" );
         exit ( 1 );
     }
 
     int BUFFER_SIZE = 5;
     char buf[BUFFER_SIZE];
-    if ( read ( file, buf, BUFFER_SIZE ) !=BUFFER_SIZE ) {
+    if ( read ( fi2c, buf, BUFFER_SIZE ) !=BUFFER_SIZE ) {
         perror ( "Failed to read in the buffer\n" );
         exit ( 1 );
     }
 
     printf ( " %02x", buf[0] );
 
-    close ( file );
 }
 
 
