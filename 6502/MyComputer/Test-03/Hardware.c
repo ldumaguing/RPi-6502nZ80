@@ -113,10 +113,6 @@ char mode_Write ( char *ram, int currAddr ) {
         perror ( "Failed to read in the buffer\n" );
         return ' ';
     }
-    if ( read ( fi2c, buf, 5 ) != 5 ) {
-        perror ( "Failed to read in the buffer\n" );
-        return ' ';
-    }
     if ( currAddr < 32768 ) {
         ram[currAddr] = buf[0];
     }
@@ -195,7 +191,6 @@ int main ( void ) {
             perror ( "Error writing to /sys/class/gpio/gpio26/value" );
             exit ( 1 );
         }
-
         usleep ( 50000 * 5 );
 
     } while ( ch != 27 );
