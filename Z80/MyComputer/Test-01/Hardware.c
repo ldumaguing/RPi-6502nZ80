@@ -49,6 +49,7 @@ void loadROM ( char *rom ) {
 }
 
 int get_RW ( int *GPIOs ) {
+/*
     char value_str[3];
     int fd;
     char buff[256];
@@ -65,6 +66,8 @@ int get_RW ( int *GPIOs ) {
     }
     close ( fd );
     return ( atoi ( value_str ) ? 1 : 0 );
+    */
+    return 0;
 }
 
 int get_current_address ( int *GPIOs ) {
@@ -98,7 +101,7 @@ int get_signals ( int *GPIOs ) {
     char buff[256];
 
     int address = 0;
-    for ( int i = 16; i < 20; i++ ) {
+    for ( int i = 16; i < 21; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/value", GPIOs[i] );
         fd = open ( buff, O_RDONLY );
         if ( -1 == fd ) {
@@ -163,7 +166,7 @@ int main ( void ) {
     int GPIOs[20] = {
         10, 22, 27, 17,  4, 14, 15, 18,  // a15 to a8
         23, 24, 25,  8,  7, 12, 16, 20,  // a7 to a0
-        13, 21, 26, 19                   // MREQ, RD, WR, MI
+        13,  6, 21, 26, 19               // IORQ, MREQ, RD, WR, MI
     };
 
     int RAM_size = 32768;    // 0000 to 7fff
@@ -304,7 +307,7 @@ void export_Addresses ( int *GPIOs ) {
     }
 
     char snum[5];
-    for ( int i=0; i < 20; i++ ) {
+    for ( int i=0; i < 21; i++ ) {
         sprintf ( snum, "%d", GPIOs[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
             perror ( "   Error writing to /sys/class/gpio/export" );
@@ -320,7 +323,7 @@ void set_direction_Addresses ( int *GPIOs ) {
     int fd;
     char buff[256];
 
-    for ( int i=0; i < 20; i++ ) {
+    for ( int i=0; i < 21; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/direction", GPIOs[i] );
         fd = open ( buff, O_WRONLY );
         if ( write ( fd, "in", 3 ) != 3 ) {
@@ -343,7 +346,7 @@ void unexport_Addresses ( int *GPIOs ) {
     }
 
     char snum[5];
-    for ( int i=0; i < 20; i++ ) {
+    for ( int i=0; i < 21; i++ ) {
         sprintf ( snum, "%d", GPIOs[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
             perror ( "Error writing to /sys/class/gpio/unexport" );
