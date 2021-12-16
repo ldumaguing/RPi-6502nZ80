@@ -9,9 +9,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include<linux/i2c.h>
-#include<linux/i2c-dev.h>
-#include<sys/ioctl.h>
+#include <linux/i2c.h>
+#include <linux/i2c-dev.h>
+#include <sys/ioctl.h>
 
 void export_CLK();
 void set_direction_CLK();
@@ -92,6 +92,33 @@ int get_current_address ( int *GPIOs ) {
     return address;
 }
 
+int get_signals ( int *GPIOs ) {
+    char value_str[3];
+    int fd;
+    char buff[256];
+
+    int address = 0;
+    for ( int i = 16; i < 20; i++ ) {
+        sprintf ( buff, "/sys/class/gpio/gpio%d/value", GPIOs[i] );
+        fd = open ( buff, O_RDONLY );
+        if ( -1 == fd ) {
+            fprintf ( stderr, "Failed to open gpio value for reading!\n" );
+            exit ( 1 );
+        }
+        if ( -1 == read ( fd, value_str, 3 ) ) {
+            fprintf ( stderr, "Failed to read value!\n" );
+            exit ( 1 );
+        }
+        address = ( address << 1 ) + atoi ( value_str );
+
+        printf("%d", atoi ( value_str ));
+
+        close ( fd );
+    }
+    printf("\n");
+    return address;
+}
+
 char mode_Read ( char *ram, char *rom, int romAddr0, int currAddr ) {
     char writeBuffer[1];
     if ( currAddr < 32768 ) { // RAM
@@ -109,6 +136,10 @@ char mode_Read ( char *ram, char *rom, int romAddr0, int currAddr ) {
 char mode_Write ( char *ram, int currAddr ) {
     char buf[5] = {'a','a','a','a',0};
 
+    char config[1] = {0};
+    config[0] = 0xFF;
+    write ( fi2c, config, 1 );
+
     if ( read ( fi2c, buf, 5 ) != 5 ) {
         perror ( "Failed to read in the buffer\n" );
         return ' ';
@@ -120,14 +151,19 @@ char mode_Write ( char *ram, int currAddr ) {
     return ram[currAddr];
 }
 
+void examine ( int addr, int *GPIOs ) {
+    printf ( "%04x ", addr);
+    get_signals ( GPIOs );
+}
+
 // **************************************************************************************
 // **************************************************************************************
 // **************************************************************************************
 int main ( void ) {
-    int GPIOs[17] = {
-        22, 27, 17,  4, 14, 15, 18, 23,  // a15 to a8
-        24, 25,  8,  7, 12, 16, 20, 21,  // a7 to a0
-        19                               // RW
+    int GPIOs[20] = {
+        10, 22, 27, 17,  4, 14, 15, 18,  // a15 to a8
+        23, 24, 25,  8,  7, 12, 16, 20,  // a7 to a0
+        13, 21, 26, 19                   // MREQ, RD, WR, MI
     };
 
     int RAM_size = 32768;    // 0000 to 7fff
@@ -136,7 +172,7 @@ int main ( void ) {
     int ROM_size = 32768;    // 8000 to ffff
     char ROM[ROM_size];
     int ROM_start_addr = 65536 - ROM_size;
-    loadROM ( ROM );
+    // loadROM ( ROM );
 
     struct termios orig_term, raw_term;
     tcgetattr ( STDIN_FILENO, &orig_term );
@@ -153,9 +189,9 @@ int main ( void ) {
     set_direction_Addresses ( GPIOs );
 
     printf ( "Press [ESC] to quit.\n" );
-    int fd = open ( "/sys/class/gpio/gpio26/value", O_WRONLY );
+    int fd = open ( "/sys/class/gpio/gpio9/value", O_WRONLY );
     if ( fd == -1 ) {
-        perror ( "EEK: Unable to open /sys/class/gpio/gpio26/value" );
+        perror ( "EEK: clock" );
         exit ( 1 );
     }
 
@@ -169,30 +205,28 @@ int main ( void ) {
 
         // ********** TIC
         if ( write ( fd, "1", 1 ) != 1 ) {
-            perror ( "Error writing to /sys/class/gpio/gpio26/value" );
+            perror ( "Error writing to clock" );
             exit ( 1 );
         }
         address = get_current_address ( GPIOs );
-        if ( isRead ) {
-            // ***** Read
+        /*
+        if ( isRead )
             datum = mode_Read ( RAM, ROM, ROM_start_addr, address );
-        } else {
-            // ***** Write
-            char config[1] = {0};
-            config[0] = 0xFF;
-            write ( fi2c, config, 1 );
+        else
             datum = mode_Write ( RAM, address );
-        }
-        printf ( "%04x %s %02x\n", address, isRead ? "r":"W", datum );
-        usleep ( 50000 * 5 );
 
+        printf ( "%04x %s %02x\n", address, isRead ? "r":"W", datum );
+        */
+        examine ( address, GPIOs );
+        usleep ( 50000 * 5 );
+    
         // ********** TOC
         if ( write ( fd, "0", 1 ) != 1 ) {
-            perror ( "Error writing to /sys/class/gpio/gpio26/value" );
+            perror ( "Error writing to clock" );
             exit ( 1 );
         }
         usleep ( 50000 * 5 );
-
+        
     } while ( ch != 27 );
 
     close ( fd );
@@ -217,7 +251,7 @@ void export_CLK() {
         exit ( 1 );
     }
 
-    if ( write ( fd, "26", 2 ) != 2 ) {
+    if ( write ( fd, "9", 2 ) != 2 ) {
         perror ( "Error writing to /sys/class/gpio/export" );
         exit ( 1 );
     }
@@ -227,14 +261,14 @@ void export_CLK() {
 
 void set_direction_CLK() {
     printf ( "set_direction\n" );
-    int fd = open ( "/sys/class/gpio/gpio26/direction", O_WRONLY );
+    int fd = open ( "/sys/class/gpio/gpio9/direction", O_WRONLY );
     if ( fd == -1 ) {
-        perror ( "Unable to open /sys/class/gpio/gpio26/direction" );
+        perror ( "Unable to open clock" );
         exit ( 1 );
     }
 
     if ( write ( fd, "out", 3 ) != 3 ) {
-        perror ( "Error writing to /sys/class/gpio/gpio26/direction" );
+        perror ( "Error writing to clock" );
         exit ( 1 );
     }
 
@@ -249,8 +283,8 @@ void unexport_CLK() {
         exit ( 1 );
     }
 
-    if ( write ( fd, "26", 2 ) != 2 ) {
-        perror ( "Error writing to /sys/class/gpio/unexport" );
+    if ( write ( fd, "9", 2 ) != 2 ) {
+        perror ( "Error writing to clock" );
         exit ( 1 );
     }
 
@@ -270,7 +304,7 @@ void export_Addresses ( int *GPIOs ) {
     }
 
     char snum[5];
-    for ( int i=0; i < 17; i++ ) {
+    for ( int i=0; i < 20; i++ ) {
         sprintf ( snum, "%d", GPIOs[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
             perror ( "   Error writing to /sys/class/gpio/export" );
@@ -286,7 +320,7 @@ void set_direction_Addresses ( int *GPIOs ) {
     int fd;
     char buff[256];
 
-    for ( int i=0; i < 17; i++ ) {
+    for ( int i=0; i < 20; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/direction", GPIOs[i] );
         fd = open ( buff, O_WRONLY );
         if ( write ( fd, "in", 3 ) != 3 ) {
@@ -309,7 +343,7 @@ void unexport_Addresses ( int *GPIOs ) {
     }
 
     char snum[5];
-    for ( int i=0; i < 17; i++ ) {
+    for ( int i=0; i < 20; i++ ) {
         sprintf ( snum, "%d", GPIOs[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
             perror ( "Error writing to /sys/class/gpio/unexport" );
