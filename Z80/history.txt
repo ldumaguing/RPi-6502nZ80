@@ -1,0 +1,956 @@
+    1  ifconfig
+    2  sudo apt update
+    3  cat /etc/os-release 
+    4  ifconfig
+    5  df
+    6  df -h
+    7  cat /etc/fstab 
+    8  top
+    9  top -d .5
+   10  exit
+   11  sudo -i
+   12  passwd
+   13  exit
+   14  gcc
+   15  gcc -version
+   16  gcc --version
+   17  ssh root@localhost
+   18  ifconfig
+   19  exit
+   20  df -h
+   21  exit
+   22  sudo -i
+   23  exit
+   24  vcgencmd bootloader_version
+   25  sudo rpi-eeprom-update
+   26  sudo apt search calcula
+   27  sudo -i
+   28  mc
+   29  sudo apt install vim
+   30  ls
+   31  cd
+   32  pwd
+   33  ls -la
+   34  df
+   35  df -h
+   36  sudo -i
+   37  apt update
+   38  sudo apt update
+   39  sudo apt upgrade
+   40  df
+   41  exit
+   42  gpio readall
+   43  gpic
+   44  sudo -i
+   45  cd Downloads/
+   46  s
+   47  ls
+   48  cd 
+   49  cd Pr
+   50  ls
+   51  cd Documents/
+   52  ls
+   53  exit
+   54  ls
+   55  unzip WiringPi-master.zip 
+   56  ls
+   57  cd WiringPi-master/
+   58  ls
+   59  ./build 
+   60  ls
+   61  mc
+   62  vim README.md 
+   63  cat INSTALL 
+   64  sudo ldconfig -p
+   65  sudo ldconfig -p | grep -i wiring
+   66  cat INSTALL 
+   67  sudo ldconfig
+   68  sudo ldconfig -p | grep -i wiring
+   69  cd
+   70  ls
+   71  mkdir Fish
+   72  cd Fish/
+   73  exit
+   74  ls
+   75  tar xvzf bcm2835-1.70.tar.gz 
+   76  ls
+   77  cd bcm2835-1.70/
+   78  ls
+   79  mkdir xxx
+   80  cd xxx
+   81  cmake ..
+   82  sudo apt install cmake
+   83  ls
+   84  cmake ..
+   85  cd ..
+   86  ls
+   87  rm -rf xxx
+   88  ./configure
+   89  make
+   90  sudo make install
+   91  sudo ldconfig
+   92  sudo ldconfig -p | grep bcm
+   93  cd
+   94  cd Fish
+   95  ls
+   96  vim fish.c
+   97  ls
+   98  gcc fish.c 
+   99  ls
+  100  cp ../gpio-main.zip .
+  101  ls
+  102  unzip gpio-main.zip 
+  103  ls
+  104  cd gpio-main/
+  105  ls
+  106  make
+  107  ls /usr/local/lib
+  108  ls
+  109  cd ..
+  110  ls
+  111  cd
+  112  ls
+  113  cd
+  114  ls
+  115  ln -s bcm2835-1.70 bcm
+  116  ls bcm
+  117  ls bcm/src/
+  118  ls
+  119  rm bcm
+  120  cd
+  121  mkdir bcm
+  122  cd bcm
+  123  ln -s /home/pi/bcm2835-1.70 bcm2835-1.68
+  124  ls
+  125  cd bcm2835-1.68
+  126  cd src
+  127  ls
+  128  cd
+  129  cd Fish/
+  130  ls
+  131  cd gpio-main/
+  132  ls
+  133  make
+  134  ls
+  135  ./main
+  136  vim main
+  137  vim main.c 
+  138  cd
+  139  cd /usr
+  140  find * | grep bcm28
+  141  find * | grep bcm2835
+  142  vim local/include/bcm2835.h
+  143  cd
+  144  ls
+  145  cd Fish/
+  146  ls
+  147  cd gpio-main/
+  148  ls
+  149  ./main
+  150  sudo ./main
+  151  vim main.c 
+  152  cear
+  153  clear
+  154  cd
+  155  gpio -g mode 17 output
+  156  gpio -g write 17 1
+  157  gpio -g write 17 0
+  158  gpio -g mode 26 output
+  159  gpio -g write 26 1
+  160  gpio -g write 26 0
+  161  sudo reboot
+  162  gpio -g mode 26 output
+  163  gpio -g write 26 1
+  164  gpio -g write 26 0
+  165  gpio -g write 26 1
+  166  gpio -g write 26 0
+  167  cd Fish/
+  168  ls
+  169  vim fish.c 
+  170  gcc fish.c 
+  171  vim fish.c 
+  172  gcc fish.c -o fish -l wiringPi
+  173  ls
+  174  ./fish 
+  175  sudo ./fish 
+  176  vim fish.c 
+  177  gcc fish.c -o fish -l wiringPi
+  178  ls
+  179  sudo ./fish 
+  180  reboot
+  181  sudo reboot
+  182  cd Fish/
+  183  ls
+  184  sudo ./fish 
+  185  ./fish 
+  186  sudo ./fish 
+  187  ps fax 
+  188  ps fax  | grep fish
+  189  sudo ./fish 
+  190  reboot
+  191  sudo  poweroff
+  192  sudo -i
+  193  ls /sys/class/gpio/
+  194  ls -la /sys/class/gpio/
+  195  cd
+  196  ls
+  197  cd Fish/
+  198  ls
+  199  cat fish.c 
+  200  vim fish.c 
+  201  gcc fish.c 
+  202  ls
+  203  ./a.out 
+  204  ls -la /sys/class/gpio/
+  205  ls
+  206  cd Fish/
+  207  ls
+  208  rm a.out 
+  209  rm fish
+  210  gcc -o fish fish.c 
+  211  vim fish.c 
+  212  cd Fish/
+  213  ls
+  214  sudo ./a.out 
+  215  sudo ./fish 
+  216  reboot
+  217  sudo reboot
+  218  cd Fish/
+  219  vim fish.c 
+  220  ls
+  221  rm fish
+  222  gcc -o fish fish.c 
+  223  ls -la /sys/class/gpio
+  224  sudo ./fish 
+  225  vim fish.c 
+  226  sudo apt update
+  227  sudo apt upgrade
+  228  sudo ./fish 
+  229  ls
+  230  sudo ./fish2
+  231  ls -la /sys/class/gpio/
+  232  cd
+  233  cd Fish/
+  234  ls
+  235  cp fish.c fish2.c
+  236  vim fish2.c 
+  237  ls
+  238  gcc -o fish2 fish2.c 
+  239  ls -la /sys/class/gpio/
+  240  cd ../..
+  241  ls
+  242  cd /sys/class/gpio/
+  243  cd ../..
+  244  ls
+  245  cd devices/
+  246  ls
+  247  cd platform/soc/fe200000.gpio
+  248  ls
+  249  cd gpio
+  250  ls
+  251  cd
+  252  ls
+  253  cd
+  254  ls
+  255  cd Fish/
+  256  ls
+  257  vim monger.c
+  258  ls
+  259  gcc -o monger monger.c 
+  260  gcc -o monger -L/usr/local/lib -I/usr/local/include monger.c 
+  261  ls /usr/local/lib
+  262  ls /usr/local/include
+  263  gcc -o monger -I/usr/local/include -L/usr/local/lib  monger.c 
+  264  gcc -o monger -I/usr/local/include/ -L/usr/local/lib/  monger.c 
+  265  vim monger.c 
+  266  gcc -o monger -I/usr/local/include/ -L/usr/local/lib/  monger.c 
+  267  gcc -o monger -I/usr/local/include -L/usr/local/lib  monger.c 
+  268  gcc -o monger monger.c 
+  269  vim monger.c 
+  270  gcc -o monger -I/usr/local/include -L/usr/local/lib  monger.c 
+  271  gcc -o monger -I/usr/local/include/ -L/usr/local/lib/  monger.c 
+  272  g++ -o monger -I/usr/local/include/ -L/usr/local/lib/  monger.c 
+  273  gcc  -I/usr/local/include/ -L/usr/local/lib/  monger.c 
+  274  sudo ldconfig -p | grep wirin
+  275  sudo rm /lib/libwiringPiDev.so
+  276  sudo rm /lib/libwiringPi.so
+  277  sudo ldconfig
+  278  sudo ldconfig -p | grep wirin
+  279  cd /lib
+  280  ls | grep wirin
+  281  ls -la | grep wirin
+  282  sudo libwiringPiDev.so.2.52
+  283  sudo rm libwiringPiDev.so.2.52
+  284  sudo rm libwiringPi.so.2.52
+  285  ls -la | grep wirin
+  286  rm libwiringPiDev.so
+  287  sudo rm libwiringPiDev.so
+  288  sudo rm libwiringPi.so
+  289  sudo ldconfig -p | grep wirin
+  290  sudo ldconfig
+  291  sudo ldconfig -p | grep wirin
+  292  cd
+  293  cd Fish/
+  294  ls
+  295  gcc monger.c 
+  296  vim monger.c 
+  297  gcc -o monger -I/usr/local/include/ -L/usr/local/lib/  monger.c 
+  298  gcc -o monger -I/usr/local/include -L/usr/local/lib  monger.c 
+  299  ls
+  300  cp /usr/local/include/wiringPi.h 
+  301  cp /usr/local/include/wiringPi.h .
+  302  ls
+  303  vim wiringPi.h 
+  304  vim monger.c 
+  305  ls
+  306  gcc monger.c 
+  307  gcc -I/.. monger.c 
+  308  gcc -I/. monger.c 
+  309  ls
+  310  cat wiringPi.h | grep pinMode
+  311  rm wiringPi.h 
+  312  ls
+  313  cd gpio-main/
+  314  ls
+  315  cat main.c 
+  316  cd ..
+  317  ls
+  318  mc
+  319  sudo apt install mc
+  320  mc
+  321  ls
+  322  cd Fish/
+  323  ls
+  324  cat monger.c 
+  325  rm monger.c 
+  326  ls
+  327  cat fish2.c 
+  328  ls
+  329  cp fish.c monger.c
+  330  vim monger.c 
+  331  ls
+  332  cd Fish
+  333  ls
+  334  vim monger.c 
+  335  gcc monger.c 
+  336  gcc -o monger monger.c 
+  337  ls
+  338  rm a.out 
+  339  ls
+  340  ./monger 
+  341  sudo monger
+  342  sudo ./monger
+  343  reboot
+  344  sudo reboot
+  345  cd Fish/
+  346  vim monger.c 
+  347  gcc -o monger monger.c 
+  348  ls
+  349  sudo ./monger 
+  350  vim monger.c 
+  351  gcc -o monger monger.c 
+  352  sudo ./monger 
+  353  cat monger.c 
+  354  echo 24 /sys/class/gpio/unexport 
+  355  sudo echo 24 /sys/class/gpio/unexport 
+  356  sudo ./monger 
+  357  sudo reboot
+  358  cd Fish/
+  359  ls
+  360  sudo ./monger 
+  361  cat monger.c
+  362  vim monger.c
+  363  gcc -o monger monger.c 
+  364  sudo ./monger 
+  365  reboot
+  366  ls
+  367  sudo ./monger 
+  368  sudo reboot
+  369  cd Fish/
+  370  sudo ./monger 
+  371  vim monger.c 
+  372  gcc -o monger monger.c 
+  373  sudo ./monger 
+  374  sudo reboot
+  375  cd Fish/
+  376  sudo ./monger 
+  377  vim monger.c 
+  378  ls
+  379  vim test.c
+  380  gcc -o test test.c
+  381  sudo ./test 
+  382  sudo reboot
+  383  cd Fish/
+  384  vim test.c 
+  385  gcc -o test test.c
+  386  sudo ./test
+  387  vim monger.c 
+  388  gcc -o monger monger.c 
+  389  sudo ./monger 
+  390  vim monger.c 
+  391  gcc -o monger monger.c 
+  392  sudo ./monger 
+  393  sudo reboot
+  394  cd Fish/
+  395  sudo ./monger 
+  396  ls
+  397  vim monger.c 
+  398  cat test.c 
+  399  ls
+  400  cat fish2.c 
+  401  ls
+  402  cp monger.c monger2.c 
+  403  vim monger2.c 
+  404  gcc -o monger2 monger2.c 
+  405  sudo ./monger2
+  406  sudo reboot
+  407  cd Fish/
+  408  vim monger2.c 
+  409  gcc -o monger2 monger2.c 
+  410  sudo ./monger2 
+  411  vim monger2.c 
+  412  gcc -o monger2 monger2.c 
+  413  vim monger2.c 
+  414  gcc -o monger2 monger2.c 
+  415  sudo ./monger2
+  416  sudo reboot
+  417  cd Fish/
+  418  ls
+  419  sudo ./monger2
+  420  sudo poweroff
+  421  cd Fish
+  422  ls
+  423  vim fish2
+  424  vim fish2.c 
+  425  vim fish.c 
+  426  gcc -o fish fish.c 
+  427  sudo ./fish
+  428  ifconfig
+  429  cd /sys
+  430  ls
+  431  clear
+  432  ls
+  433  cd class
+  434  ls
+  435  cd gpio
+  436  ls
+  437  ls -la
+  438  cd
+  439  cd Fish/
+  440  cat fish.c 
+  441  sudo reboot
+  442  cd Fish/
+  443  ls
+  444  vim fish.c
+  445  gcc -o fish fish.c
+  446  sudo ./fish
+  447  cd Fish/
+  448  ls
+  449  vim fish.c
+  450  gcc -o fish fish.c 
+  451  cat monger.c 
+  452  q!
+  453  cat monger2.c 
+  454  ./fish
+  455  sudo ./fish
+  456  sudo reboot
+  457  ls
+  458  cd Fish/
+  459  ls
+  460  cat fish.c 
+  461  gcc -o fish fish.c 
+  462  sudo ./fish
+  463  sudo poweroff
+  464  cd Fish/
+  465  ls
+  466  cat fish.c 
+  467  sudo ./fish
+  468  sudo poweroff
+  469  cd Fish/
+  470  sudo ./fish
+  471  cd Fis
+  472  cd Fish/
+  473  ls
+  474  sudo ./fish
+  475  ifconfig
+  476  exit
+  477  poweroff
+  478  exit
+  479  sudo poweroff
+  480  sudo -i
+  481  ls
+  482  ls Fish/
+  483  exit
+  484  ls
+  485  cd Virt/
+  486  ls
+  487  clear
+  488  ls
+  489  gcc -o clock clock.c 
+  490  sudo ./clock 
+  491  ls
+  492  cat clock.c 
+  493  ls
+  494  vim CLK.c
+  495  vim CLK.c 
+  496  ls
+  497  cd
+  498  cd Virt/
+  499  ls
+  500  cat CLK.c 
+  501  ls
+  502  cat clock.c 
+  503  ls
+  504  gcc -o CLK CLK.c 
+  505  ls
+  506  vim CLK.c 
+  507  ls -la
+  508  rm .CLK.c.swp 
+  509  vim CLK.c 
+  510  gcc -o CLK CLK.c 
+  511  ls
+  512  ./CLK 
+  513  vim CLK.c 
+  514  gcc -o CLK CLK.c 
+  515  ./CLK 
+  516  vim CLK.c 
+  517  gcc -o CLK CLK.c 
+  518  ./CLK 
+  519  vim CLK.c 
+  520  gcc -o CLK CLK.c 
+  521  ./CLK 
+  522  vim CLK.c 
+  523  gcc -o CLK CLK.c 
+  524  vim CLK.c 
+  525  gcc -o CLK CLK.c 
+  526  vim CLK.c 
+  527  gcc -o CLK CLK.c 
+  528  vim CLK.c 
+  529  gcc -o CLK CLK.c 
+  530  vim CLK.c 
+  531  gcc -o CLK CLK.c 
+  532  sudo ./CLK 
+  533  ps fax | grep CLK
+  534  sudo reboot
+  535  ls
+  536  cd Virt/
+  537  ls
+  538  clear
+  539  ls
+  540  vim CLK.c 
+  541  gcc -o CLK CLK.c 
+  542  vim CLK.c 
+  543  gcc -o CLK CLK.c 
+  544  vim CLK.c 
+  545  gcc -o CLK CLK.c 
+  546  sudo ./CLK 
+  547  cd Virt/
+  548  gcc -o CLK CLK.c 
+  549  exit
+  550  ps fax 
+  551  top
+  552  ls
+  553  cd
+  554  cd Virt/
+  555  ls
+  556  sudo ./clock
+  557  vim CLK.c 
+  558  gcc -o CLK CLK.c 
+  559  sudo ./CLK 
+  560  ex
+  561  cd Virt
+  562  ls
+  563  vim CLK.c 
+  564  gcc -o CLK CLK.c 
+  565  sudo ./CLK 
+  566  a
+  567  cd Virt
+  568  ls
+  569  vim CLK.c 
+  570  cat CLK.c 
+  571  sudo ./CLK
+  572  cd Virt
+  573  vim CLK.c 
+  574  gcc -o CLK CLK.c 
+  575  sudo ./CLK 
+  576  vim CLK.c 
+  577  gcc -o CLK CLK.c 
+  578  sudo ./CLK 
+  579  sudo reboot
+  580  cd Virt
+  581  ls
+  582  vim CLK.c 
+  583  gcc -o CLK CLK.c 
+  584  sudo ./CLK 
+  585  vim CLK.c 
+  586  cat CLK.c 
+  587  cd Virt/
+  588  ls
+  589  cat CLK.c 
+  590  cd
+  591  exit
+  592  sudo reboot
+  593  cd Virt
+  594  ls
+  595  cat Analyzer.c 
+  596  clear
+  597  vim Analyzer.c 
+  598  vim CLK.c 
+  599  gcc -o CLK CLK.c 
+  600  sudo ./CLK
+  601  ls
+  602  vim Analyzer.c 
+  603  gcc -o Analyzer Analyzer.c 
+  604  sudo ./Analyzer 
+  605  cd Virt
+  606  ls
+  607  vim Analyzer.c 
+  608  sudo ./Analyzer 
+  609  cd Virt
+  610  vim Analyzer.c 
+  611  gcc -o Analyzer Analyzer.c 
+  612  sudo ./Analyzer 
+  613  exit
+  614  cd Virt
+  615  sudo ./Analyzer 
+  616  cd Virt
+  617  ls
+  618  sudo reboot
+  619  cd Virt
+  620  sudo ./Analyzer 
+  621  vim Analyzer.c 
+  622  gcc -o Analyzer Analyzer.c 
+  623  sudo ./Analyzer 
+  624  sudo poweroff
+  625  cd Virt
+  626  ls
+  627  sudo ./CLK 
+  628  vim CLK.c 
+  629  gcc -o CLK CLK.c 
+  630  sudo ./CLK 
+  631  cd Virt
+  632  ls
+  633  sudo ./CLK 
+  634  find /sys/class/gpio/
+  635  sudo poweroff
+  636  cd Virt
+  637  vim Analyzer.c 
+  638  gcc -o Analyzer Analyzer.c 
+  639  sudo ./Analyzer 
+  640  ls
+  641  vim Analyzer.c 
+  642  ls
+  643  sudo ./Analyzer 
+  644  cd Virt/
+  645  ls
+  646  vim CLK.c 
+  647  gcc -o CLK CLK.c 
+  648  sudo ./CLK 
+  649  sudo reboot
+  650  cd Virt/
+  651  ls
+  652  clear
+  653  sudo ./CLK 
+  654  sudo poweroff
+  655  cd Virt/
+  656  ls
+  657  vim CLK.c 
+  658  gcc -o CLK CLK.c 
+  659  sudo ./CLK 
+  660  exit
+  661  cd Virt/
+  662  vim Analyzer.c 
+  663  gcc -o Analyzer Analyzer.c 
+  664  cat Analyzer.c 
+  665  sudo ./Analyzer 
+  666  ls
+  667  exit
+  668  ifconfig
+  669  apt update
+  670  sudo apt update
+  671  sudo apt upgrade
+  672  sudo apt install i2c-tools
+  673  reboot
+  674  startx
+  675  exit
+  676  ls
+  677  exit
+  678  ls
+  679  mv Virt RPi_Z80
+  680  ls
+  681  cd RPi_Z80/
+  682  ls
+  683  vim CLK.c 
+  684  gcc -o CLK CLK.c 
+  685  sudo ./CLK 
+  686  vim CLK.c 
+  687  gcc -o CLK CLK.c 
+  688  find /sys/class/gpio/
+  689  reboot
+  690  ifconfig
+  691  ls
+  692  cd RPi_Z80/
+  693  ls
+  694  gcc -o CLK CLK.c 
+  695  find * /sys/class/gpio/
+  696  ls
+  697  sudo ./CLK 
+  698  ls -r /sys/class/gpio/
+  699  sudo reboot
+  700  ls
+  701  cd RPi_Z80/
+  702  vim CLK.c 
+  703  gcc -o CLK CLK.c 
+  704  sudo ./CLK 
+  705  exit
+  706  clear
+  707  cd RPi_Z80/
+  708  ls
+  709  ls -la
+  710  vim GPIOs.c 
+  711  gcc -o GPIOs GPIOs.c 
+  712  ls
+  713  sudo ./GPIOs 
+  714  exit
+  715  cd RPi_Z80/
+  716  ls
+  717  sudo ./CLK 
+  718  cat NOP.sh 
+  719  i2cdetect 
+  720  i2cdetect -l
+  721  i2cdetect -y -r 1
+  722  i2cdump -y 1 0x38 b
+  723  i2cget -y 1 0x38
+  724  i2cget -y 1 0x38 0xea
+  725  i2cget -y 1 0x38
+  726  i2cdetect -l
+  727  i2cdump -y 1 0x38 b
+  728  i2cdump -y 21 0x38 b
+  729  i2cdump -y 20 0x38 b
+  730  i2cdetect -l
+  731  i2cdetect -y -r 1
+  732  i2cdetect -y 1 0x38 b
+  733  i2cdump -y 1 0x38 b
+  734  sudo poweroff
+  735  cd RPi_Z80/
+  736  ls
+  737  vim NOP.sh 
+  738  chmod 770 NOP.sh 
+  739  vim NOP.sh 
+  740  ./NOP.sh 
+  741  sudo ./CLK 
+  742  exit
+  743  cd RPi_Z80/
+  744  ls
+  745  sudo ./GPIOs 
+  746  exit
+  747  i2cdump -y 1 0x38 b
+  748  i2cget -y 1 0x38
+  749  i2cget -y 1 0x38 0
+  750  i2cget -y 1 0x38
+  751  sudo poweroff
+  752  cd RPi_Z80/
+  753  vim GPIOs.c 
+  754  gcc -o GPIOs GPIOs.c 
+  755  vim GPIOs.c 
+  756  gcc -o GPIOs GPIOs.c 
+  757  cat NOP.sh 
+  758  ./NOP.sh 
+  759  i2cget -y 1 0x38
+  760  exit
+  761  cd RPi_Z80/
+  762  sudo ./GPIOs 
+  763  cd RPi_Z80/
+  764  sudo ./CLK 
+  765  sudo poweroff
+  766  cd RPi_Z80/
+  767  ls
+  768  vim GPIOs.c 
+  769  cp GPIOs.c GPIOs_v2.c
+  770  vim GPIOs_v2.c 
+  771  gcc -o GPIOs_v2  GPIOs_v2.c 
+  772  vim GPIOs_v2.c 
+  773  gcc -o GPIOs_v2  GPIOs_v2.c 
+  774  sudo ./CLK 
+  775  ls
+  776  ./NOP.sh 
+  777  sudo ./CLK 
+  778  vim GPIOs_v2.c 
+  779  gcc -o GPIOs_v2  GPIOs_v2.c 
+  780  ./NOP.sh 
+  781  sudo ./CLK 
+  782  gcc -o GPIOs_v2  GPIOs_v2.c 
+  783  vim GPIOs_v2.c 
+  784  gcc -o GPIOs_v2  GPIOs_v2.c 
+  785  sudo ./CLK 
+  786  vim GPIOs_v2.c 
+  787  gcc -o GPIOs_v2  GPIOs_v2.c 
+  788  sudo ./CLK 
+  789  vim GPIOs_v2.c 
+  790  gcc -o GPIOs_v2  GPIOs_v2.c 
+  791  sudo ./CLK 
+  792  vim GPIOs_v2.c 
+  793  gcc -o GPIOs_v2  GPIOs_v2.c 
+  794  sudo ./CLK 
+  795  vim GPIOs_v2.c 
+  796  gcc -o GPIOs_v2  GPIOs_v2.c 
+  797  sudo ./CLK 
+  798  vim GPIOs_v2.c 
+  799  cat GPIOs_v2
+  800  q!
+  801  cat GPIOs_v2.c 
+  802  vim GPIOs_v2.c 
+  803  gcc -o GPIOs_v2  GPIOs_v2.c 
+  804  vim GPIOs_v2.c 
+  805  gcc -o GPIOs_v2  GPIOs_v2.c 
+  806  vim GPIOs_v2.c 
+  807  gcc -o GPIOs_v2  GPIOs_v2.c 
+  808  ./NOP.sh 
+  809  ./CLK 
+  810  cd RPi_Z80/
+  811  ls
+  812  sudo ./GPIOs_v2 
+  813  cd RPi_Z80/
+  814  ls
+  815  sudo reboot
+  816  cd RPi_Z80/
+  817  ./NOP.sh 
+  818  sudo ./CLK 
+  819  vim GPIOs_v2.c 
+  820  gcc -o GPIOs_v2  GPIOs_v2.c 
+  821  ./NOP.sh 
+  822  sudo ./CLK 
+  823  vim GPIOs_v2.c 
+  824  gcc -o GPIOs_v2  GPIOs_v2.c 
+  825  ./NOP.sh 
+  826  sudo ./CLK 
+  827  ./NOP.sh 
+  828  sudo ./CLK 
+  829  ls
+  830  sudo ./CLK 
+  831  vim GPIOs_v2
+  832  vim GPIOs_v2.c 
+  833  gcc -o GPIOs_v2  GPIOs_v2.c 
+  834  ./NOP.sh 
+  835  sudo ./CLK 
+  836  vim GPIOs_v2.c 
+  837  gcc -o GPIOs_v2  GPIOs_v2.c 
+  838  sudo ./CLK 
+  839  ./NOP.sh 
+  840  sudo ./CLK 
+  841  vim GPIOs_v2.c 
+  842  gcc -o GPIOs_v2  GPIOs_v2.c 
+  843  ./NOP.sh 
+  844  sudo ./CLK 
+  845  vim GPIOs_v2.c 
+  846  gcc -o GPIOs_v2  GPIOs_v2.c 
+  847  ./NOP.sh 
+  848  sudo ./CLK 
+  849  vim GPIOs_v2.c 
+  850  gcc -o GPIOs_v2  GPIOs_v2.c 
+  851  ./NOP.sh 
+  852  sudo ./CLK 
+  853  vim GPIOs_v2.c 
+  854  gcc -o GPIOs_v2  GPIOs_v2.c 
+  855  ./NOP.sh 
+  856  sudo ./CLK 
+  857  vim GPIOs_v2.c 
+  858  gcc -o GPIOs_v2  GPIOs_v2.c 
+  859  ./NOP.sh 
+  860  sudo ./CLK 
+  861  vim GPIOs_v2.c 
+  862  gcc -o GPIOs_v2  GPIOs_v2.c 
+  863  ./NOP.sh 
+  864  sudo ./CLK 
+  865  vim GPIOs_v2.c 
+  866  gcc -o GPIOs_v2  GPIOs_v2.c 
+  867  ./NOP.sh 
+  868  sudo ./CLK 
+  869  vim GPIOs_v2.c 
+  870  gcc -o GPIOs_v2  GPIOs_v2.c 
+  871  ./NOP.sh 
+  872  sudo ./CLK 
+  873  reboot
+  874  sudo reboot
+  875  cd RPi_Z80/
+  876  cd RPi_Z80/
+  877  sudo ./GPIOs_v2 
+  878  sudo ./GPIOs_v2
+  879  sudo ./GPIOs
+  880  sudo ./GPIOs_v2 
+  881  sudo ./GPIOs
+  882  sudo ./GPIOs_v2 
+  883  ls -la /sys/class/gpio/
+  884  sudo ./GPIOs_v2 
+  885  cd RPi_Z80/
+  886  sudo ./GPIOs_v2 
+  887  sudo ./GPIOs
+  888  cat GPIOs_v2.c  | grep '<<'
+  889  cat GPIOs_v2.c  | grep 'address'
+  890  cat GPIOs_v2.c | less
+  891  cat GPIOs_v2.c | more
+  892  more GPIOs_v2.c 
+  893  vim GPIOs_v2.c 
+  894  sudo ./test 
+  895  sudo ./GPIOs_v2 
+  896  cd RPi_Z80/
+  897  ./NOP.sh 
+  898  sudo ./CLK 
+  899  ls
+  900  cp GPIOs.c test.c
+  901  vim test.c 
+  902  gcc -o test test.c
+  903  ./NOP.sh 
+  904  sudo ./CLK 
+  905  vim test.c 
+  906  vim GPIOs_v2.c 
+  907  gcc -o GPIOs_v2 GPIOs_v2.c 
+  908  ./NOP.sh 
+  909  sudo ./CLK 
+  910  vim GPIOs_v2.c 
+  911  gcc -o GPIOs_v2 GPIOs_v2.c 
+  912  sudo ./CLK 
+  913  vim GPIOs_v2.c 
+  914  gcc -o GPIOs_v2 GPIOs_v2.c 
+  915  ./NOP.sh 
+  916  sudo ./CLK 
+  917  vim GPIOs_v2.c 
+  918  gcc -o GPIOs_v2 GPIOs_v2.c 
+  919  ./NOP.sh 
+  920  sudo ./CLK 
+  921  vim test.c
+  922  vim GPIOs_v2.c 
+  923  gcc -o GPIOs_v2 GPIOs_v2.c 
+  924  ./NOP.sh 
+  925  sudo ./CLK 
+  926  vim GPIOs_v2.c 
+  927  gcc -o GPIOs_v2 GPIOs_v2.c 
+  928  ./NOP.sh 
+  929  sudo ./CLK 
+  930  vim GPIOs_v2.c 
+  931  gcc -o GPIOs_v2 GPIOs_v2.c 
+  932  ./NOP.sh 
+  933  sudo ./CLK 
+  934  vim GPIOs_v2.c 
+  935  gcc -o GPIOs_v2 GPIOs_v2.c 
+  936  ./NOP.sh 
+  937  sudo ./CLK 
+  938  ls
+  939  cat GPIOs_v2.c 
+  940  sudo poweroff
+  941  ls
+  942  sudo poweroff
+  943  ifconfig
+  944  exit
+  945  ls
+  946  mv RPi_Z80 Z80
+  947  ls
+  948  cd Z80/
+  949  ls
+  950  cat test.c 
+  951  vim geti2c.c
+  952  vi geti2c.c
+  953  ls
+  954  vim geti2c.c 
+  955  ls
+  956  history > history.txt
