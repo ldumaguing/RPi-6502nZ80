@@ -9,9 +9,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include<linux/i2c.h>
-#include<linux/i2c-dev.h>
-#include<sys/ioctl.h>
+#include <linux/i2c.h>
+#include <linux/i2c-dev.h>
+#include <sys/ioctl.h>
 
 void export_CLK();
 void set_direction_CLK();
