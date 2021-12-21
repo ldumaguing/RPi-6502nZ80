@@ -1,0 +1,1000 @@
+  542  vim CLK.c 
+  543  gcc -o CLK CLK.c 
+  544  vim CLK.c 
+  545  gcc -o CLK CLK.c 
+  546  sudo ./CLK 
+  547  cd Virt/
+  548  gcc -o CLK CLK.c 
+  549  exit
+  550  ps fax 
+  551  top
+  552  ls
+  553  cd
+  554  cd Virt/
+  555  ls
+  556  sudo ./clock
+  557  vim CLK.c 
+  558  gcc -o CLK CLK.c 
+  559  sudo ./CLK 
+  560  ex
+  561  cd Virt
+  562  ls
+  563  vim CLK.c 
+  564  gcc -o CLK CLK.c 
+  565  sudo ./CLK 
+  566  a
+  567  cd Virt
+  568  ls
+  569  vim CLK.c 
+  570  cat CLK.c 
+  571  sudo ./CLK
+  572  cd Virt
+  573  vim CLK.c 
+  574  gcc -o CLK CLK.c 
+  575  sudo ./CLK 
+  576  vim CLK.c 
+  577  gcc -o CLK CLK.c 
+  578  sudo ./CLK 
+  579  sudo reboot
+  580  cd Virt
+  581  ls
+  582  vim CLK.c 
+  583  gcc -o CLK CLK.c 
+  584  sudo ./CLK 
+  585  vim CLK.c 
+  586  cat CLK.c 
+  587  cd Virt/
+  588  ls
+  589  cat CLK.c 
+  590  cd
+  591  exit
+  592  sudo reboot
+  593  cd Virt
+  594  ls
+  595  cat Analyzer.c 
+  596  clear
+  597  vim Analyzer.c 
+  598  vim CLK.c 
+  599  gcc -o CLK CLK.c 
+  600  sudo ./CLK
+  601  ls
+  602  vim Analyzer.c 
+  603  gcc -o Analyzer Analyzer.c 
+  604  sudo ./Analyzer 
+  605  cd Virt
+  606  ls
+  607  vim Analyzer.c 
+  608  sudo ./Analyzer 
+  609  cd Virt
+  610  vim Analyzer.c 
+  611  gcc -o Analyzer Analyzer.c 
+  612  sudo ./Analyzer 
+  613  exit
+  614  cd Virt
+  615  sudo ./Analyzer 
+  616  cd Virt
+  617  ls
+  618  sudo reboot
+  619  cd Virt
+  620  sudo ./Analyzer 
+  621  vim Analyzer.c 
+  622  gcc -o Analyzer Analyzer.c 
+  623  sudo ./Analyzer 
+  624  sudo poweroff
+  625  cd Virt
+  626  ls
+  627  sudo ./CLK 
+  628  vim CLK.c 
+  629  gcc -o CLK CLK.c 
+  630  sudo ./CLK 
+  631  cd Virt
+  632  ls
+  633  sudo ./CLK 
+  634  find /sys/class/gpio/
+  635  sudo poweroff
+  636  cd Virt
+  637  vim Analyzer.c 
+  638  gcc -o Analyzer Analyzer.c 
+  639  sudo ./Analyzer 
+  640  ls
+  641  vim Analyzer.c 
+  642  ls
+  643  sudo ./Analyzer 
+  644  cd Virt/
+  645  ls
+  646  vim CLK.c 
+  647  gcc -o CLK CLK.c 
+  648  sudo ./CLK 
+  649  sudo reboot
+  650  cd Virt/
+  651  ls
+  652  clear
+  653  sudo ./CLK 
+  654  sudo poweroff
+  655  cd Virt/
+  656  ls
+  657  vim CLK.c 
+  658  gcc -o CLK CLK.c 
+  659  sudo ./CLK 
+  660  exit
+  661  cd Virt/
+  662  vim Analyzer.c 
+  663  gcc -o Analyzer Analyzer.c 
+  664  cat Analyzer.c 
+  665  sudo ./Analyzer 
+  666  ls
+  667  exit
+  668  ifconfig
+  669  apt update
+  670  sudo apt update
+  671  sudo apt upgrade
+  672  sudo apt install i2c-tools
+  673  reboot
+  674  startx
+  675  exit
+  676  ls
+  677  exit
+  678  ls
+  679  mv Virt RPi_Z80
+  680  ls
+  681  cd RPi_Z80/
+  682  ls
+  683  vim CLK.c 
+  684  gcc -o CLK CLK.c 
+  685  sudo ./CLK 
+  686  vim CLK.c 
+  687  gcc -o CLK CLK.c 
+  688  find /sys/class/gpio/
+  689  reboot
+  690  ifconfig
+  691  ls
+  692  cd RPi_Z80/
+  693  ls
+  694  gcc -o CLK CLK.c 
+  695  find * /sys/class/gpio/
+  696  ls
+  697  sudo ./CLK 
+  698  ls -r /sys/class/gpio/
+  699  sudo reboot
+  700  ls
+  701  cd RPi_Z80/
+  702  vim CLK.c 
+  703  gcc -o CLK CLK.c 
+  704  sudo ./CLK 
+  705  exit
+  706  clear
+  707  cd RPi_Z80/
+  708  ls
+  709  ls -la
+  710  vim GPIOs.c 
+  711  gcc -o GPIOs GPIOs.c 
+  712  ls
+  713  sudo ./GPIOs 
+  714  exit
+  715  cd RPi_Z80/
+  716  ls
+  717  sudo ./CLK 
+  718  cat NOP.sh 
+  719  i2cdetect 
+  720  i2cdetect -l
+  721  i2cdetect -y -r 1
+  722  i2cdump -y 1 0x38 b
+  723  i2cget -y 1 0x38
+  724  i2cget -y 1 0x38 0xea
+  725  i2cget -y 1 0x38
+  726  i2cdetect -l
+  727  i2cdump -y 1 0x38 b
+  728  i2cdump -y 21 0x38 b
+  729  i2cdump -y 20 0x38 b
+  730  i2cdetect -l
+  731  i2cdetect -y -r 1
+  732  i2cdetect -y 1 0x38 b
+  733  i2cdump -y 1 0x38 b
+  734  sudo poweroff
+  735  cd RPi_Z80/
+  736  ls
+  737  vim NOP.sh 
+  738  chmod 770 NOP.sh 
+  739  vim NOP.sh 
+  740  ./NOP.sh 
+  741  sudo ./CLK 
+  742  exit
+  743  cd RPi_Z80/
+  744  ls
+  745  sudo ./GPIOs 
+  746  exit
+  747  i2cdump -y 1 0x38 b
+  748  i2cget -y 1 0x38
+  749  i2cget -y 1 0x38 0
+  750  i2cget -y 1 0x38
+  751  sudo poweroff
+  752  cd RPi_Z80/
+  753  vim GPIOs.c 
+  754  gcc -o GPIOs GPIOs.c 
+  755  vim GPIOs.c 
+  756  gcc -o GPIOs GPIOs.c 
+  757  cat NOP.sh 
+  758  ./NOP.sh 
+  759  i2cget -y 1 0x38
+  760  exit
+  761  cd RPi_Z80/
+  762  sudo ./GPIOs 
+  763  cd RPi_Z80/
+  764  sudo ./CLK 
+  765  sudo poweroff
+  766  cd RPi_Z80/
+  767  ls
+  768  vim GPIOs.c 
+  769  cp GPIOs.c GPIOs_v2.c
+  770  vim GPIOs_v2.c 
+  771  gcc -o GPIOs_v2  GPIOs_v2.c 
+  772  vim GPIOs_v2.c 
+  773  gcc -o GPIOs_v2  GPIOs_v2.c 
+  774  sudo ./CLK 
+  775  ls
+  776  ./NOP.sh 
+  777  sudo ./CLK 
+  778  vim GPIOs_v2.c 
+  779  gcc -o GPIOs_v2  GPIOs_v2.c 
+  780  ./NOP.sh 
+  781  sudo ./CLK 
+  782  gcc -o GPIOs_v2  GPIOs_v2.c 
+  783  vim GPIOs_v2.c 
+  784  gcc -o GPIOs_v2  GPIOs_v2.c 
+  785  sudo ./CLK 
+  786  vim GPIOs_v2.c 
+  787  gcc -o GPIOs_v2  GPIOs_v2.c 
+  788  sudo ./CLK 
+  789  vim GPIOs_v2.c 
+  790  gcc -o GPIOs_v2  GPIOs_v2.c 
+  791  sudo ./CLK 
+  792  vim GPIOs_v2.c 
+  793  gcc -o GPIOs_v2  GPIOs_v2.c 
+  794  sudo ./CLK 
+  795  vim GPIOs_v2.c 
+  796  gcc -o GPIOs_v2  GPIOs_v2.c 
+  797  sudo ./CLK 
+  798  vim GPIOs_v2.c 
+  799  cat GPIOs_v2
+  800  q!
+  801  cat GPIOs_v2.c 
+  802  vim GPIOs_v2.c 
+  803  gcc -o GPIOs_v2  GPIOs_v2.c 
+  804  vim GPIOs_v2.c 
+  805  gcc -o GPIOs_v2  GPIOs_v2.c 
+  806  vim GPIOs_v2.c 
+  807  gcc -o GPIOs_v2  GPIOs_v2.c 
+  808  ./NOP.sh 
+  809  ./CLK 
+  810  cd RPi_Z80/
+  811  ls
+  812  sudo ./GPIOs_v2 
+  813  cd RPi_Z80/
+  814  ls
+  815  sudo reboot
+  816  cd RPi_Z80/
+  817  ./NOP.sh 
+  818  sudo ./CLK 
+  819  vim GPIOs_v2.c 
+  820  gcc -o GPIOs_v2  GPIOs_v2.c 
+  821  ./NOP.sh 
+  822  sudo ./CLK 
+  823  vim GPIOs_v2.c 
+  824  gcc -o GPIOs_v2  GPIOs_v2.c 
+  825  ./NOP.sh 
+  826  sudo ./CLK 
+  827  ./NOP.sh 
+  828  sudo ./CLK 
+  829  ls
+  830  sudo ./CLK 
+  831  vim GPIOs_v2
+  832  vim GPIOs_v2.c 
+  833  gcc -o GPIOs_v2  GPIOs_v2.c 
+  834  ./NOP.sh 
+  835  sudo ./CLK 
+  836  vim GPIOs_v2.c 
+  837  gcc -o GPIOs_v2  GPIOs_v2.c 
+  838  sudo ./CLK 
+  839  ./NOP.sh 
+  840  sudo ./CLK 
+  841  vim GPIOs_v2.c 
+  842  gcc -o GPIOs_v2  GPIOs_v2.c 
+  843  ./NOP.sh 
+  844  sudo ./CLK 
+  845  vim GPIOs_v2.c 
+  846  gcc -o GPIOs_v2  GPIOs_v2.c 
+  847  ./NOP.sh 
+  848  sudo ./CLK 
+  849  vim GPIOs_v2.c 
+  850  gcc -o GPIOs_v2  GPIOs_v2.c 
+  851  ./NOP.sh 
+  852  sudo ./CLK 
+  853  vim GPIOs_v2.c 
+  854  gcc -o GPIOs_v2  GPIOs_v2.c 
+  855  ./NOP.sh 
+  856  sudo ./CLK 
+  857  vim GPIOs_v2.c 
+  858  gcc -o GPIOs_v2  GPIOs_v2.c 
+  859  ./NOP.sh 
+  860  sudo ./CLK 
+  861  vim GPIOs_v2.c 
+  862  gcc -o GPIOs_v2  GPIOs_v2.c 
+  863  ./NOP.sh 
+  864  sudo ./CLK 
+  865  vim GPIOs_v2.c 
+  866  gcc -o GPIOs_v2  GPIOs_v2.c 
+  867  ./NOP.sh 
+  868  sudo ./CLK 
+  869  vim GPIOs_v2.c 
+  870  gcc -o GPIOs_v2  GPIOs_v2.c 
+  871  ./NOP.sh 
+  872  sudo ./CLK 
+  873  reboot
+  874  sudo reboot
+  875  cd RPi_Z80/
+  876  cd RPi_Z80/
+  877  sudo ./GPIOs_v2 
+  878  sudo ./GPIOs_v2
+  879  sudo ./GPIOs
+  880  sudo ./GPIOs_v2 
+  881  sudo ./GPIOs
+  882  sudo ./GPIOs_v2 
+  883  ls -la /sys/class/gpio/
+  884  sudo ./GPIOs_v2 
+  885  cd RPi_Z80/
+  886  sudo ./GPIOs_v2 
+  887  sudo ./GPIOs
+  888  cat GPIOs_v2.c  | grep '<<'
+  889  cat GPIOs_v2.c  | grep 'address'
+  890  cat GPIOs_v2.c | less
+  891  cat GPIOs_v2.c | more
+  892  more GPIOs_v2.c 
+  893  vim GPIOs_v2.c 
+  894  sudo ./test 
+  895  sudo ./GPIOs_v2 
+  896  cd RPi_Z80/
+  897  ./NOP.sh 
+  898  sudo ./CLK 
+  899  ls
+  900  cp GPIOs.c test.c
+  901  vim test.c 
+  902  gcc -o test test.c
+  903  ./NOP.sh 
+  904  sudo ./CLK 
+  905  vim test.c 
+  906  vim GPIOs_v2.c 
+  907  gcc -o GPIOs_v2 GPIOs_v2.c 
+  908  ./NOP.sh 
+  909  sudo ./CLK 
+  910  vim GPIOs_v2.c 
+  911  gcc -o GPIOs_v2 GPIOs_v2.c 
+  912  sudo ./CLK 
+  913  vim GPIOs_v2.c 
+  914  gcc -o GPIOs_v2 GPIOs_v2.c 
+  915  ./NOP.sh 
+  916  sudo ./CLK 
+  917  vim GPIOs_v2.c 
+  918  gcc -o GPIOs_v2 GPIOs_v2.c 
+  919  ./NOP.sh 
+  920  sudo ./CLK 
+  921  vim test.c
+  922  vim GPIOs_v2.c 
+  923  gcc -o GPIOs_v2 GPIOs_v2.c 
+  924  ./NOP.sh 
+  925  sudo ./CLK 
+  926  vim GPIOs_v2.c 
+  927  gcc -o GPIOs_v2 GPIOs_v2.c 
+  928  ./NOP.sh 
+  929  sudo ./CLK 
+  930  vim GPIOs_v2.c 
+  931  gcc -o GPIOs_v2 GPIOs_v2.c 
+  932  ./NOP.sh 
+  933  sudo ./CLK 
+  934  vim GPIOs_v2.c 
+  935  gcc -o GPIOs_v2 GPIOs_v2.c 
+  936  ./NOP.sh 
+  937  sudo ./CLK 
+  938  ls
+  939  cat GPIOs_v2.c 
+  940  sudo poweroff
+  941  ls
+  942  sudo poweroff
+  943  ifconfig
+  944  exit
+  945  ls
+  946  mv RPi_Z80 Z80
+  947  ls
+  948  cd Z80/
+  949  ls
+  950  cat test.c 
+  951  vim geti2c.c
+  952  vi geti2c.c
+  953  ls
+  954  vim geti2c.c 
+  955  ls
+  956  history > history.txt
+  957  cat history.txt | grep i2c
+  958  i2cdetect -l
+  959  i2cget -y 1 0x38
+  960  i2cget -y 1 0x38 0
+  961  i2cget -y 1 0x38
+  962  i2cdump -y 1 0x38 b
+  963  i2cget -y 1 0x38
+  964  i2cdump -y 1 0x38 b
+  965  i2cget -y 1 0x38
+  966  i2cget -y 1 0x38 0
+  967  i2cget -y 1 0x38
+  968  i2cdump -y 1 0x38 b
+  969  i2cget -y 1 0x38
+  970  i2cdump -y 1 0x38 b
+  971  i2cget -y 1 0x38
+  972  i2cget -y 1 0x38 0
+  973  i2cdump -y 1 0x38 b
+  974  ls
+  975  vim geti2c.c 
+  976  gcc -o geti2c geti2c.c 
+  977  cat GPIOs_v2.c 
+  978  vim geti2c.c 
+  979  gcc -o geti2c geti2c.c 
+  980  vim geti2c.c 
+  981  gcc -o geti2c geti2c.c 
+  982  ls
+  983  ./geti2c 
+  984  vim geti2c.c 
+  985  gcc -o geti2c geti2c.c 
+  986  ./geti2c 
+  987  vim geti2c.c 
+  988  gcc -o geti2c geti2c.c 
+  989  ./geti2c 
+  990  vim geti2c.c 
+  991  gcc -o geti2c geti2c.c 
+  992  vim geti2c.c 
+  993  gcc -o geti2c geti2c.c 
+  994  ./geti2c 
+  995  vim geti2c.c 
+  996  gcc -o geti2c geti2c.c 
+  997  ./geti2c 
+  998  vim geti2c.c 
+  999  gcc -o geti2c geti2c.c 
+ 1000  ./geti2c 
+ 1001  sudo poweroff
+ 1002  sudo apt update
+ 1003  sudo apt upgrade
+ 1004  sudo poweroff
+ 1005  ls
+ 1006  sudo apt update
+ 1007  sudo apt upgrade
+ 1008  sudo poweroff
+ 1009  sudo apt update
+ 1010  sudo apt upgrade
+ 1011  sudo poweroff
+ 1012  sudo apt update
+ 1013  sudo apt upgrade
+ 1014  sudo apt update
+ 1015  ifconfig
+ 1016  ls
+ 1017  sudo apt search sshfs
+ 1018  df
+ 1019  exit
+ 1020  ls
+ 1021  cd Z80/
+ 1022  ls
+ 1023  cd MyComputer/
+ 1024  ls
+ 1025  cd Test-01/
+ 1026  ls
+ 1027  mc
+ 1028  ls
+ 1029  cp Hardware.c test.c
+ 1030  ls
+ 1031  gcc -o test test.c 
+ 1032  sudo ./test 
+ 1033  gcc -o test test.c 
+ 1034  sudo ./test 
+ 1035  ls
+ 1036  vim NOP.sh
+ 1037  ls
+ 1038  chmod 770 NOP.sh 
+ 1039  ls
+ 1040  ./NOP.sh 
+ 1041  i2cget -y 1 0x38
+ 1042  sudo ./test 
+ 1043  i2cget -y 1 0x38
+ 1044  sudo ./test 
+ 1045  gcc -o test test.c 
+ 1046  i2cget -y 1 0x38
+ 1047  sudo ./test 
+ 1048  gcc -o test test.c 
+ 1049  sudo ./test 
+ 1050  sudo poweroff
+ 1051  cd Z80/
+ 1052  ls
+ 1053  cd MyComputer/
+ 1054  ls
+ 1055  cd Test-01/
+ 1056  ls
+ 1057  gcc -o test test.c 
+ 1058  ./NOP.sh 
+ 1059  sudo ./test 
+ 1060  ls -r /sys/class/gpio/
+ 1061  sudo reboot
+ 1062  cd Z80/MyComputer/Test-01/
+ 1063  ls
+ 1064  gcc -o test test.c 
+ 1065  ./NOP.sh 
+ 1066  sudo ./test 
+ 1067  cat NOP.sh 
+ 1068  i2cget -y 1 0x38
+ 1069  gcc -o test test.c 
+ 1070  cat NOP.sh 
+ 1071  ./NOP.sh 
+ 1072  sudo ./test 
+ 1073  exit
+ 1074  cd Z80/MyComputer/Test-01/
+ 1075  ls
+ 1076  gcc -o test test.c 
+ 1077  ./NOP.sh 
+ 1078  cat NOP.sh 
+ 1079  i2cget -y 1 0x38
+ 1080  sudo ./test 
+ 1081  ls
+ 1082  gcc -o test test.c 
+ 1083  ./NOP.sh 
+ 1084  sudo ./test 
+ 1085  gcc -o test test.c 
+ 1086  sudo ./test 
+ 1087  gcc -o test test.c 
+ 1088  sudo ./test 
+ 1089  gcc -o test test.c 
+ 1090  sudo ./test 
+ 1091  exit
+ 1092  cd Z80/MyComputer/
+ 1093  ls
+ 1094  cd Test-01/
+ 1095  ls
+ 1096  ./NOP.sh 
+ 1097  sudo ./test 
+ 1098  exit
+ 1099  sudo poweroff
+ 1100  cd Z80/MyComputer/Test-01/
+ 1101  ls
+ 1102  vim test.c 
+ 1103  gcc -o test test.c 
+ 1104  ./NOP.sh 
+ 1105  sudo ./test 
+ 1106  exit
+ 1107  ls
+ 1108  cd Z80/
+ 1109  ls
+ 1110  cd MyComputer/Test-01/
+ 1111  ls
+ 1112  gcc -o Hardware Hardware.c 
+ 1113  ls
+ 1114  ./NOP.sh 
+ 1115  sudo ./Hardware 
+ 1116  exit
+ 1117  sudo apt update
+ 1118  sudo apt upgrade
+ 1119  sudo apt autoremove
+ 1120  sudo poweroff
+ 1121  ls
+ 1122  ls Z80/
+ 1123  cd Z80/
+ 1124  ls
+ 1125  cd MyComputer/
+ 1126  ls
+ 1127  cd Test-01/
+ 1128  ls
+ 1129  exit
+ 1130  cd Z80
+ 1131  ls
+ 1132  cd MyComputer/
+ 1133  ls
+ 1134  cd Test-01/
+ 1135  ls
+ 1136  mv makeROM_ea.py makeROM_NOP.py
+ 1137  ls
+ 1138  vim makeROM_NOP.py 
+ 1139  ls
+ 1140  sudo apt update
+ 1141  sudo apt upgrade
+ 1142  reboot
+ 1143  sudo reboot
+ 1144  cd Z80/MyComputer/
+ 1145  uptime
+ 1146  ls
+ 1147  cd Test-01/
+ 1148  ls
+ 1149  python makeROM_NOP.py 
+ 1150  python3 makeROM_NOP.py 
+ 1151  ls
+ 1152  hexdump -C rom.bin 
+ 1153  cat Hardware.c 
+ 1154  sudo ./Hardware 
+ 1155  ls
+ 1156  gcc -o Hardware_v2 Hardware_v2.c 
+ 1157  sudo ./Hardware_v2
+ 1158  ./NOP.sh 
+ 1159  sudo ./Hardware_v2
+ 1160  cat NOP.sh 
+ 1161  i2cget -y 1 0x38 0xea
+ 1162  i2cget -y 1 0x38
+ 1163  sudo ./Hardware_v2 
+ 1164  gcc -o Hardware_v2 Hardware_v2.c 
+ 1165  i2cget -y 1 0x38 
+ 1166  sudo ./Hardware_v2 
+ 1167  i2cget -y 1 0x38 
+ 1168  gcc -o Hardware_v2 Hardware_v2.c 
+ 1169  sudo ./Hardware_v2 
+ 1170  gcc -o Hardware_v2 Hardware_v2.c 
+ 1171  sudo ./Hardware_v2 
+ 1172  ls
+ 1173  cat makeROM_v2.py 
+ 1174  cat makeROM_NOP.py 
+ 1175  cp makeROM_mine.py
+ 1176  cp makeROM_NOP.py makeROM_mine.py
+ 1177  ls
+ 1178  cat makeROM_mine.py 
+ 1179  ls
+ 1180  python3 makeROM_mine.py 
+ 1181  vim makeROM_mine.py 
+ 1182  python3 makeROM_mine.py 
+ 1183  hexdump -C rom.bin 
+ 1184  sudo ./Hardware
+ 1185  gcc -o Hardware_v2 Hardware_v2.c 
+ 1186  sudo ./Hardware
+ 1187  sudo ./Hardware_v2 
+ 1188  vim makeROM_mine.py 
+ 1189  hexdum -C rom.bin 
+ 1190  hexdump -C rom.bin 
+ 1191  vim makeROM_mine.py 
+ 1192  python3 makeROM_mine.py 
+ 1193  hexdump -C rom.bin 
+ 1194  gcc -o Hardware_v2 Hardware_v2.c 
+ 1195  sudo ./Hardware_v2 
+ 1196  gcc -o Hardware_v2 Hardware_v2.c 
+ 1197  sudo ./Hardware_v2 
+ 1198  gcc -o Hardware_v2 Hardware_v2.c 
+ 1199  sudo ./Hardware_v2 
+ 1200  gcc -o Hardware_v2 Hardware_v2.c 
+ 1201  sudo ./Hardware_v2 
+ 1202  hexdump -C rom.bin 
+ 1203  vim makeROM_mine.py 
+ 1204  python3 makeROM_mine.py 
+ 1205  hexdump -C rom.bin 
+ 1206  gcc -o Hardware_v2 Hardware_v2.c 
+ 1207  sudo ./Hardware_v2 
+ 1208  gcc -o Hardware_v2 Hardware_v2.c 
+ 1209  sudo ./Hardware_v2 
+ 1210  gcc -o Hardware_v2 Hardware_v2.c 
+ 1211  sudo ./Hardware_v2 
+ 1212  vim makeROM_mine.py 
+ 1213  hexdump -C rom.bin 
+ 1214  python3 makeROM_mine.py 
+ 1215  hexdump -C rom.bin 
+ 1216  sudo ./Hardware_v2 
+ 1217  python3 makeROM_mine.py 
+ 1218  vim makeROM_mine.py 
+ 1219  python3 makeROM_mine.py 
+ 1220  sudo ./Hardware_v2 
+ 1221  vim makeROM_mine.py 
+ 1222  python3 makeROM_mine.py 
+ 1223  hexdump -C rom.bin 
+ 1224  sudo ./Hardware_v2 
+ 1225  vim makeROM_mine.py 
+ 1226  hexdump -C rom.bin 
+ 1227  python3 makeROM_mine.py 
+ 1228  hexdump -C rom.bin 
+ 1229  sudo ./Hardware_v2 
+ 1230  sjasmplus
+ 1231  sudo apt search sjasmplus
+ 1232  cd
+ 1233  ls
+ 1234  cd Z80/
+ 1235  ls
+ 1236  mv vasm.tar.gz ..
+ 1237  ls
+ 1238  cd
+ 1239  ls
+ 1240  mkdir bin
+ 1241  echo $PATH
+ 1242  ls
+ 1243  cd
+ 1244  ls
+ 1245  tar xvzf vasm.tar.gz 
+ 1246  gunzip vasm.tar.gz 
+ 1247  ls
+ 1248  tar xvf vasm.tar.gz 
+ 1249  ls
+ 1250  cd vasm/
+ 1251  ls
+ 1252  make CPU=z80 SYNTAX=oldstyle
+ 1253  ls
+ 1254  echo $PATH
+ 1255  sudo mc
+ 1256  ls
+ 1257  vasmz80_oldstyle 
+ 1258  cd
+ 1259  cd Z80/
+ 1260  ls
+ 1261  cd MyComputer/
+ 1262  ls
+ 1263  cd Test-01/
+ 1264  ls
+ 1265  cat test.c 
+ 1266  ls
+ 1267  vim fish.asm
+ 1268  ls
+ 1269  vasmz80_oldstyle fish.asm 
+ 1270  ls
+ 1271  hexdump a.out
+ 1272  vim fish.asm
+ 1273  vasmz80_oldstyle fish.asm 
+ 1274  vim fish.asm
+ 1275  vasmz80_oldstyle fish.asm 
+ 1276  vasmz80_oldstyle 
+ 1277  vasmz80_oldstyle -dotdir fish.asm 
+ 1278  hexdump a.out
+ 1279  vim fish.asm
+ 1280  vasmz80_oldstyle -dotdir fish.asm 
+ 1281  hexdump a.out
+ 1282  ls
+ 1283  ls -la
+ 1284  vasmz80_oldstyle -dotdir fish.asm 
+ 1285  ls -la
+ 1286  hexdump -C a.cout
+ 1287  hexdump -C a.out
+ 1288  vasmz80_oldstyle -dotdir fish.asm 
+ 1289  ls -la
+ 1290  vim fish.asm
+ 1291  vasmz80_oldstyle -dotdir fish.asm 
+ 1292  hexdump -C a.out
+ 1293  vim makeROM_mine.py 
+ 1294  python3 makeROM_mine.py 
+ 1295  sudo ./Hardware_v2 
+ 1296  ls
+ 1297  hexdump -C rom.bin 
+ 1298  vim makeROM_mine.py 
+ 1299  python3 makeROM_mine.py 
+ 1300  hexdump -C rom.bin 
+ 1301  sudo ./Hardware_v2 
+ 1302  vim makeROM_mine.py 
+ 1303  python3 makeROM_mine.py 
+ 1304  hexdump -C rom.bin 
+ 1305  sudo ./Hardware_v2 
+ 1306  python3 makeROM_mine.py 
+ 1307  gcc -o Hardware_v2 Hardware_v2.c 
+ 1308  sudo ./Hardware_v2 
+ 1309  gcc -o Hardware_v2 Hardware_v2.c 
+ 1310  sudo ./Hardware_v2 
+ 1311  gcc -o Hardware_v2 Hardware_v2.c 
+ 1312  sudo ./Hardware_v2 
+ 1313  vim fish.asm 
+ 1314  vasmz80_oldstyle -dotdir fish.asm 
+ 1315  ls -la
+ 1316  hexdump a.out 
+ 1317  vobjdump a.out 
+ 1318  hexdump -C a.out 
+ 1319  cp a.out rom.bin
+ 1320  ls -la
+ 1321  sudo ./Hardware_v2 
+ 1322  vim fish.asm 
+ 1323  vasmz80_oldstyle -dotdir fish.asm 
+ 1324  cat fish.asm 
+ 1325  cp a.out rom.bin
+ 1326  sudo ./Hardware_v2 
+ 1327  ls
+ 1328  vim makeROM_mine.py 
+ 1329  python3 makeROM_mine.py 
+ 1330  hexdump -C rom.bin 
+ 1331  sudo ./Hardware_v2 
+ 1332  gcc -o Hardware_v2 Hardware_v2.c 
+ 1333  sudo ./Hardware_v2 
+ 1334  gcc -o Hardware_v2 Hardware_v2.c 
+ 1335  sudo ./Hardware_v2 
+ 1336  gcc -o Hardware_v2 Hardware_v2.c 
+ 1337  sudo ./Hardware_v2 
+ 1338  gcc -o Hardware_v2 Hardware_v2.c 
+ 1339  sudo ./Hardware_v2 
+ 1340  sudo reboot
+ 1341  cd Z80/MyComputer/
+ 1342  ls
+ 1343  cd Test-01/
+ 1344  ls
+ 1345  gcc -o Hardware_v2 Hardware_v2.c 
+ 1346  more Hardware_v2.c 
+ 1347  gcc -o Hardware_v2 Hardware_v2.c 
+ 1348  sudo ./Hardware_v2 
+ 1349  sudo reboot
+ 1350  cd Z80/MyComputer/Test-01/
+ 1351  ls
+ 1352  vim Hardware_v2.c 
+ 1353  gcc -o Hardware_v2 Hardware_v2.c 
+ 1354  sudo ./Hardware_v2 
+ 1355  vim Hardware_v2.c 
+ 1356  sudo reboot
+ 1357  ls
+ 1358  cd Z80/MyComputer/Test-01/
+ 1359  ls
+ 1360  sudo ./Hardware_v2 
+ 1361  gcc -o Hardware_v2 Hardware_v2.c 
+ 1362  sudo reboot
+ 1363  cd Z80/MyComputer/Test-01/
+ 1364  ls
+ 1365  sudo ./Hardware_v2 
+ 1366  ./NOP.sh 
+ 1367  sudo ./Hardware_v2 
+ 1368  gcc -o Hardware_v2 Hardware_v2.c 
+ 1369  sudo ./Hardware_v2 
+ 1370  ls
+ 1371  gcc -o Hardware_v2 Hardware_v2.c 
+ 1372  sudo ./Hardware_v2 
+ 1373  ./NOP.sh 
+ 1374  sudo ./Hardware_v2 
+ 1375  cat NOP.sh 
+ 1376  i2cget -y 1 0x38
+ 1377  gcc -o Hardware_v2 Hardware_v2.c 
+ 1378  sudo ./Hardware_v2 
+ 1379  gcc -o Hardware_v2 Hardware_v2.c 
+ 1380  sudo ./Hardware_v2 
+ 1381  ls
+ 1382  python3 makeROM_NOP.py 
+ 1383  hexdump -C rom.bin 
+ 1384  gcc -o Hardware_v2 Hardware_v2.c 
+ 1385  sudo ./Hardware_v2 
+ 1386  gcc -o Hardware_v2 Hardware_v2.c 
+ 1387  sudo ./Hardware_v2 
+ 1388  gcc -o Hardware_v2 Hardware_v2.c 
+ 1389  sudo ./Hardware_v2 
+ 1390  hexdump rom.bin 
+ 1391  gcc -o Hardware_v2 Hardware_v2.c 
+ 1392  hexdump rom.bin 
+ 1393  sudo ./Hardware_v2 
+ 1394  gcc -o Hardware_v2 Hardware_v2.c 
+ 1395  sudo ./Hardware_v2 
+ 1396  gcc -o Hardware_v2 Hardware_v2.c 
+ 1397  sudo ./Hardware_v2 
+ 1398  gcc -o Hardware_v2 Hardware_v2.c 
+ 1399  sudo ./Hardware_v2 
+ 1400  gcc -o Hardware_v2 Hardware_v2.c 
+ 1401  sudo ./Hardware_v2 
+ 1402  gcc -o Hardware_v2 Hardware_v2.c 
+ 1403  sudo ./Hardware_v2 
+ 1404  gcc -o Hardware_v2 Hardware_v2.c 
+ 1405  sudo ./Hardware_v2 
+ 1406  gcc -o Hardware_v2 Hardware_v2.c 
+ 1407  sudo ./Hardware_v2 
+ 1408  gcc -o Hardware_v2 Hardware_v2.c 
+ 1409  sudo ./Hardware_v2 
+ 1410  gcc -o Hardware_v2 Hardware_v2.c 
+ 1411  sudo ./Hardware_v2 
+ 1412  gcc -o Hardware_v2 Hardware_v2.c 
+ 1413  sudo ./Hardware_v2 
+ 1414  gcc -o Hardware_v2 Hardware_v2.c 
+ 1415  sudo ./Hardware_v2 
+ 1416  gcc -o Hardware_v2 Hardware_v2.c 
+ 1417  sudo ./Hardware_v2 
+ 1418  gcc -o Hardware_v2 Hardware_v2.c 
+ 1419  sudo ./Hardware_v2 
+ 1420  gcc -o Hardware_v2 Hardware_v2.c 
+ 1421  sudo ./Hardware_v2 
+ 1422  gcc -o Hardware_v2 Hardware_v2.c 
+ 1423  sudo ./Hardware_v2 
+ 1424  ls
+ 1425  mc
+ 1426  ls
+ 1427  python3 makeROM_mine.py 
+ 1428  hexdump -C rom.bin 
+ 1429  sudo ./Hardware_v2 
+ 1430  gcc -o Hardware_v2 Hardware_v2.c 
+ 1431  sudo ./Hardware_v2 
+ 1432  ls
+ 1433  vim fish.asm 
+ 1434  vasmz80_oldstyle -dotdir fish.asm 
+ 1435  hexdump -C a.out 
+ 1436  vasmz80_oldstyle -l -dotdir fish.asm 
+ 1437  ls
+ 1438  vim makeROM_mine.py 
+ 1439  python3 makeROM_mine.py 
+ 1440  hexdump -C rom.bin 
+ 1441  ls
+ 1442  sudo ./Hardware_v2 
+ 1443  cd
+ 1444  ls
+ 1445  unzip sjasmplus-master.zip 
+ 1446  cd sjasmplus-master/
+ 1447  ls
+ 1448  mkdir xxx
+ 1449  cd xxx
+ 1450  cmake ../
+ 1451  make
+ 1452  ls
+ 1453  sudo make install
+ 1454  cd
+ 1455  ls
+ 1456  cd Z80/MyComputer/
+ 1457  ls
+ 1458  cd Test-01/
+ 1459  ls
+ 1460  sjasmplus fish.asm 
+ 1461  ls
+ 1462  ls -la
+ 1463  hexdump -C a.out 
+ 1464  ls
+ 1465  rm a.out 
+ 1466  sjasmplus fish.asm 
+ 1467  ls -la
+ 1468  man sjasmplus 
+ 1469  vim fish.asm 
+ 1470  rm rom.bin 
+ 1471  sjasmplus fish.asm 
+ 1472  ls
+ 1473  vim fish.asm 
+ 1474  sjasmplus --raw=rom.bin fish.asm 
+ 1475  ls
+ 1476  ls -la
+ 1477  hexdump -C rom.bin 
+ 1478  vim fish.asm 
+ 1479  sjasmplus --raw=rom.bin fish.asm 
+ 1480  hexdump -C rom.bin 
+ 1481  sudo ./Hardware_v2 
+ 1482  hexdump -C rom.bin 
+ 1483  vim fish.asm 
+ 1484  sjasmplus --raw=rom.bin fish.asm 
+ 1485  vim fish.asm 
+ 1486  sjasmplus --raw=rom.bin fish.asm 
+ 1487  ls
+ 1488  hexdump -C rom.bin 
+ 1489  sudo ./Hardware_v2 
+ 1490  ls
+ 1491  cd Z80/
+ 1492  ls
+ 1493  mc
+ 1494  cd MyComputer/
+ 1495  ls
+ 1496  cd Test-01/
+ 1497  ls
+ 1498  sudo ./Hardware_v2 
+ 1499  sudo poweroff
+ 1500  !
+ 1501  sudo apt update
+ 1502  sudo apt upgrade
+ 1503  cd Z80/MyComputer/Test-01/
+ 1504  ls
+ 1505  gcc -o Hardware_v3 Hardware_v3.c 
+ 1506  sudo ./Hardware_v3
+ 1507  ls
+ 1508  sudo ./closeGPIOs 
+ 1509  sudo ./Hardware_v3
+ 1510  sudo ./closeGPIOs 
+ 1511  gcc -o Hardware_v3 Hardware_v3.c 
+ 1512  sudo ./Hardware_v3
+ 1513  sudo ./closeGPIOs 
+ 1514  ls
+ 1515  hexdump -C rom.bin 
+ 1516  cat fish.asm 
+ 1517  cp fish.asm fish01.asm
+ 1518  vim fish01.asm 
+ 1519  sjasmplus 
+ 1520  sjasmplus --raw=rom.bin fish01.asm 
+ 1521  vim fish01.asm 
+ 1522  sjasmplus --raw=rom.bin fish01.asm 
+ 1523  vim fish01.asm 
+ 1524  sjasmplus --raw=rom.bin fish01.asm 
+ 1525  mc
+ 1526  ls
+ 1527  hexdump -C rom.bin 
+ 1528  sudo ./Hardware_v3 
+ 1529  gcc -o Hardware_v3 Hardware_v3.c 
+ 1530  sudo ./Hardware_v3 
+ 1531  gcc -o Hardware_v3 Hardware_v3.c 
+ 1532  sudo ./Hardware_v3 
+ 1533  hexdump -C rom.bin 
+ 1534  sudo ./Hardware_v3 
+ 1535  gcc -o Hardware_v3 Hardware_v3.c 
+ 1536  sudo ./Hardware_v3 
+ 1537  gcc -o Hardware_v3 Hardware_v3.c 
+ 1538  sudo ./Hardware_v3 
+ 1539  history | grep sj
+ 1540  sjasmplus --raw=rom.bin fish01.asm
+ 1541  history > history.txt
