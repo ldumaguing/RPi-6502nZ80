@@ -6,7 +6,7 @@ pull
 status
 
 
-ssh-keygen -t rsa -b 4096 -C "os2nlinux@gmail.com"
+ssh-keygen -t rsa -b 4096 -C "zzz@xxx.com"
 
 
 git clone git@github.com:ldumaguing/RPi-6502nZ80.git
