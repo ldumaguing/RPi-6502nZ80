@@ -17,3 +17,8 @@ git add .
 git commit -m "bla"
 git push
 
+
+
+gcc hello7_mouse.c `sdl2-config --cflags --libs` -lSDL2_image -lm
+
+
