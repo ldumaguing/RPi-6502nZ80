@@ -23,4 +23,6 @@ gcc hello7_mouse.c `sdl2-config --cflags --libs` -lSDL2_image -lm
 
 https://www.youtube.com/playlist?list=PLHJE4y54mpC5_eEz9gCqIkNpU-n_2eyNt
 
+https://stackoverflow.com/questions/57672568/sdl2-on-raspberry-pi-without-x
+
 
