@@ -14,6 +14,64 @@
 #include <sys/ioctl.h>
 
 int clk, fi2c;
+int TicToc = 0;  // Tic = 1, Toc = 0
+
+// **************************************************************************************
+void display_Address ( int* gpios ) {
+    char buf[5] = {'a', 'a', 'a', 'a', 0};
+    int addr;
+
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
+        perror ( "Failed to connect to 21\n" );
+        return;
+    }
+    if ( read ( fi2c, buf, 5 ) != 5 ) {
+        perror ( "Failed to read in the buffer\n" );
+        return;
+    }
+    addr = buf[0];
+
+
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x22 ) < 0 ) {
+        perror ( "Failed to connect to 22\n" );
+        return;
+    }
+    if ( read ( fi2c, buf, 5 ) != 5 ) {
+        perror ( "Failed to read in the buffer\n" );
+        return;
+    }
+    addr += ( buf[0] * 256 );
+
+    printf ( " %04x", addr );
+
+
+
+
+
+
+    char value_str[3];
+    int fd;
+    char buff[256];
+    if ( TicToc == 0 ) {
+        printf("...Toc");
+        for ( int i = 7; i < 15; i++ ) {
+            sprintf ( buff, "/sys/class/gpio/gpio%d/value", gpios[i] );
+            fd = open ( buff, O_RDONLY );
+            if ( -1 == fd ) {
+                fprintf ( stderr, "Failed to open BA gpio value for reading!\n" );
+                exit ( 1 );
+            }
+            if ( -1 == read ( fd, value_str, 3 ) ) {
+                fprintf ( stderr, "Failed to read value!\n" );
+                exit ( 1 );
+            }
+            close ( fd );
+            printf ( "%d", atoi ( value_str ) ? 1 : 0 );
+        }
+    }
+
+    printf ( "\n" );
+}
 
 // **************************************************************************************
 void display_Signals ( int* gpios ) {
@@ -42,12 +100,13 @@ void display_Signals ( int* gpios ) {
         }
     }
 
-    printf ( "\n" );
+    display_Address ( gpios );
 }
 
 // **************************************************************************************
 void HardwarePhase ( int* gpios ) {
     // ********** TIC
+    TicToc = 1;
     if ( write ( clk, "1", 1 ) != 1 ) {
         perror ( "Error writing to clock" );
         exit ( 1 );
@@ -58,6 +117,7 @@ void HardwarePhase ( int* gpios ) {
 
 
     // ********** TOC
+    TicToc = 0;
     if ( write ( clk, "0", 1 ) != 1 ) {
         perror ( "Error writing to clock" );
         exit ( 1 );
@@ -68,6 +128,7 @@ void HardwarePhase ( int* gpios ) {
 
 
 }
+
 // **************************************************************************************
 void export_CLK() {
     printf ( "export_CLK\n" );
