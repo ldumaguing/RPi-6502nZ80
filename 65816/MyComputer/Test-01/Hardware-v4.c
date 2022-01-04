@@ -17,7 +17,8 @@
 
 int clk, fi2c;
 int TicToc = 0;  // Tic = 1, Toc = 0
-int Datum, Address;
+int Datum, Address, BA;
+int Signals[7] = { 0, 0, 0, 0, 0, 0, 0};
 
 // **************************************************************************************
 void display_Address ( int* gpios ) {
@@ -46,7 +47,7 @@ void display_Address ( int* gpios ) {
     // printf ( "\nB: %02x\n", buf[0] );
     addr += ( buf[0] << 8 );
 
-
+    printf ( " %04x", addr );
 
 
 
@@ -73,12 +74,29 @@ void display_Address ( int* gpios ) {
         x += ( atoi ( value_str ) ? 1 : 0 ) * ( pow ( 2, i - 7 ) );
     }
 
+    if ( TicToc == 0 ) {
+        BA = x;
+        Address = addr + (BA << 16);
+    }
+    else
+        Datum = x;
+
     // printf ( "C: %02x\n", x );
+    printf ( " .%02x %06x %02x", BA, Address, Datum );
+
+    /*
     x <<= 16;
     addr += x;
     Address = addr;
     printf ( " %06x\n", Address );
+    */
 
+    if (TicToc) {
+        
+    }
+    
+    
+    printf ( "\n" );
 }
 
 // **************************************************************************************
@@ -104,14 +122,15 @@ void display_Signals ( int* gpios ) {
             printf ( " %s", atoi ( value_str ) ? "r" : "W" );
         else if ( i == 5 )
             printf ( " %s", atoi ( value_str ) ? "E" : "-" );
-        else if (i == 2)
+        else if ( i == 2 )
             printf ( " %s", atoi ( value_str ) ? "VPA" : "---" );
-        else if (i == 3)
+        else if ( i == 3 )
             printf ( " %s", atoi ( value_str ) ? "VDA " : "--- " );
         else {
             printf ( "%d", atoi ( value_str ) ? 1 : 0 );
             if ( i == 2 ) printf ( " " );
         }
+        Signals[i] = atoi ( value_str ) ? 1 : 0;
     }
 
     display_Address ( gpios );
