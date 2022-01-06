@@ -21,6 +21,46 @@ int Datum, Address, BA;
 int Signals[7] = { 0, 0, 0, 0, 0, 0, 0};
 
 // **************************************************************************************
+void DataPhase ( int* gpios ) {
+    if ( Signals[6] == 0 ) return;
+    if ( TicToc == 0 ) return;
+
+    int byteVal[] = { 0, 1, 0, 1, 0, 1, 1, 1 };
+
+    int fd;
+    char buff[256];
+    for ( int i = 7; i < 15; i++ ) {
+        sprintf ( buff, "/sys/class/gpio/gpio%d/direction", gpios[i] );
+        fd = open ( buff, O_WRONLY );
+        if ( fd == -1 ) {
+            perror ( "DataPhase open error" );
+            exit ( 1 );
+        }
+        if ( write ( fd, "out", 3 ) != 3 ) {
+            perror ( "DataPhase out error" );
+            exit ( 1 );
+        }
+        close ( fd );
+    }
+
+
+    for ( int i = 7; i < 15; i++ ) {
+        sprintf ( buff, "/sys/class/gpio/gpio%d/value", gpios[i] );
+        fd = open ( buff, O_WRONLY );
+        if ( fd == -1 ) {
+            perror ( "DataPhase value error" );
+            exit ( 1 );
+        }
+        sprintf ( buff, "%d", byteVal[i - 7] );
+        if ( write ( fd, buff, 1 ) != 1 ) {
+            perror ( "DataPhase assign value error" );
+            exit ( 1 );
+        }
+        close ( fd );
+    }
+}
+
+// **************************************************************************************
 void display_Address ( int* gpios ) {
     char buf[5] = {'a', 'a', 'a', 'a', 0};
     int addr;
@@ -48,9 +88,6 @@ void display_Address ( int* gpios ) {
     addr += ( buf[0] << 8 );
 
     printf ( " %04x", addr );
-
-
-
 
 
     char value_str[3];
@@ -85,17 +122,6 @@ void display_Address ( int* gpios ) {
 
     // printf ( "C: %02x\n", x );
     printf ( " .%02x %06x %02x", BA, Address, Datum );
-
-    /*
-    x <<= 16;
-    addr += x;
-    Address = addr;
-    printf ( " %06x\n", Address );
-    */
-
-    if ( TicToc ) {
-
-    }
 
 
     printf ( "\n" );
@@ -148,6 +174,7 @@ void HardwarePhase ( int* gpios ) {
     }
     printf ( "Tic: " );
     display_Signals ( gpios );
+    DataPhase ( gpios );
     usleep ( 50000 * 3 );
 
 
@@ -157,8 +184,9 @@ void HardwarePhase ( int* gpios ) {
         perror ( "Error writing to clock" );
         exit ( 1 );
     }
-    printf ( "Toc: " );
+    printf ( "\nToc: " );
     display_Signals ( gpios );
+    DataPhase ( gpios );
     usleep ( 50000 * 3 );
 }
 
@@ -178,11 +206,11 @@ void export_CLK() {
     }
 
     close ( fd );
-}
 
-void set_CLK_direction() {
+
+
     printf ( "set_direction\n" );
-    int fd = open ( "/sys/class/gpio/gpio6/direction", O_WRONLY );
+    fd = open ( "/sys/class/gpio/gpio6/direction", O_WRONLY );
     if ( fd == -1 ) {
         perror ( "Unable to open clock" );
         exit ( 1 );
@@ -345,7 +373,6 @@ int main ( void ) {
 
 
     export_CLK();
-    set_CLK_direction();
     open_i2c();
     export_Signals ( GPIOs );
     export_BAs ( GPIOs );
@@ -396,6 +423,8 @@ int main ( void ) {
 
     return 0;
 }
+
+
 
 
 
