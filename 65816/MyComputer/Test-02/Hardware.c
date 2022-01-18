@@ -56,11 +56,40 @@ void DataPhase ( int* gpios ) {
         }
     }
 
-    for ( int i=0; i<8; i++ ) close ( DataPhase_fds[i] );
+    for ( int i = 0; i < 8; i++ ) close ( DataPhase_fds[i] );
 }
 
 // **************************************************************************************
 void AddressPhase ( int* gpios ) {
+    char buf[5] = {'a', 'a', 'a', 'a', 0};
+    int addr;
+
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
+        perror ( "Failed to connect to 21\n" );
+        return;
+    }
+    if ( read ( fi2c, buf, 5 ) != 5 ) {
+        perror ( "Failed to read in the buffer\n" );
+        return;
+    }
+    addr = buf[0];
+    // printf ( "\nA: %02x", addr );
+
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x22 ) < 0 ) {
+        perror ( "Failed to connect to 22\n" );
+        return;
+    }
+    if ( read ( fi2c, buf, 5 ) != 5 ) {
+        perror ( "Failed to read in the buffer\n" );
+        return;
+    }
+    // printf ( "\nB: %02x\n", buf[0] );
+
+    addr += ( buf[0] << 8 );
+    Address = addr;
+    printf ( " %04x", addr );
+
+
     char value_str[3];
     char buff[256];
     int fds[8];
@@ -93,37 +122,6 @@ void AddressPhase ( int* gpios ) {
     printf ( ".%02x.%06x", BA, FullAddr );
 
     for ( int i = 0; i < 8; i++ ) close ( fds[i] );
-}
-
-// **************************************************************************************
-void display_Address ( int* gpios ) {
-    char buf[5] = {'a', 'a', 'a', 'a', 0};
-    int addr;
-
-    if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
-        perror ( "Failed to connect to 21\n" );
-        return;
-    }
-    if ( read ( fi2c, buf, 5 ) != 5 ) {
-        perror ( "Failed to read in the buffer\n" );
-        return;
-    }
-    addr = buf[0];
-    // printf ( "\nA: %02x", addr );
-
-    if ( ioctl ( fi2c, I2C_SLAVE, 0x22 ) < 0 ) {
-        perror ( "Failed to connect to 22\n" );
-        return;
-    }
-    if ( read ( fi2c, buf, 5 ) != 5 ) {
-        perror ( "Failed to read in the buffer\n" );
-        return;
-    }
-    // printf ( "\nB: %02x\n", buf[0] );
-
-    addr += ( buf[0] << 8 );
-    Address = addr;
-    printf ( " %04x", addr );
 }
 
 // **************************************************************************************
@@ -164,7 +162,6 @@ void display_Signals ( int* gpios ) {
 // **************************************************************************************
 void HardwarePhase ( int* gpios ) {
     // ******************** TIC
-    // Data mode
     TicToc = 1;
     printf ( "\nTic: " );
     if ( write ( clk, "1", 1 ) != 1 ) {
@@ -172,11 +169,8 @@ void HardwarePhase ( int* gpios ) {
         exit ( 1 );
     }
     display_Signals ( gpios );
-    display_Address ( gpios );
     DataPhase ( gpios );
     usleep ( 50000 * 3 );
-
-
 
 
     // ******************** TOC
@@ -187,13 +181,8 @@ void HardwarePhase ( int* gpios ) {
         exit ( 1 );
     }
     display_Signals ( gpios );
-    display_Address ( gpios );
     AddressPhase ( gpios );
     usleep ( 50000 * 3 );
-
-
-
-
 }
 
 // **************************************************************************************
@@ -212,7 +201,6 @@ void export_CLK() {
     }
 
     close ( fd );
-
 
 
     printf ( "set_direction\n" );
@@ -368,7 +356,6 @@ int main ( void ) {
         24, 25,  8,  7,   // D0, D1, D2, D3
         12, 16, 20, 21    // D4, D5, D6, D7
     };
-
 
 
     struct termios orig_term, raw_term;
