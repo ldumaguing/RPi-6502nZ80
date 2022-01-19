@@ -19,7 +19,19 @@ int clk, fi2c, Address;
 int TicToc = 0;  // Tic = 1, Toc = 0
 int Signals[7] = { 0, 0, 0, 0, 0, 0, 0};
 
+#define ROM_size 32768
+char ROM[ROM_size];
+
 void close_BAs ( int* );
+
+// **************************************************************************************
+void loadROM () {
+    printf ( "Loading ROM...\n" );
+    FILE* fp;
+    fp = fopen ( "rom.bin", "rb" );
+    fread ( ROM, ROM_size, 1, fp );
+    fclose ( fp );
+}
 
 // **************************************************************************************
 void Write_Mode ( int* gpios ) {
@@ -44,6 +56,7 @@ void Read_Mode ( int* gpios ) {
     }
 
 
+    printf("\n>%d<", Address);
     int DataPhase_fds[8];
     int ByteData[] = { 0, 1, 0, 1, 0, 1, 1, 1 };
     for ( int i = 7; i < 15; i++ ) {
@@ -373,7 +386,7 @@ int main ( void ) {
     raw_term.c_cc[VTIME] = 0;
     tcsetattr ( STDIN_FILENO, TCSANOW, &raw_term );
 
-
+    loadROM();
     export_CLK();
     open_i2c();
     export_Signals ( GPIOs );
