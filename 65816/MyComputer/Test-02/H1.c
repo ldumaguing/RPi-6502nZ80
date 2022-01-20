@@ -19,8 +19,12 @@ int clk, fi2c, Address;
 int TicToc = 0;  // Tic = 1, Toc = 0
 int Signals[7] = { 0, 0, 0, 0, 0, 0, 0};
 
-#define ROM_size 32768
-char ROM[ROM_size];
+#define ROM_size 16384
+#define RAM_size 49152
+#define starting_ROM_address 49152   // c000
+#define sixtyfourK 65536
+unsigned char ROM[ROM_size];
+unsigned char RAM[RAM_size];
 
 void close_BAs ( int* );
 
@@ -34,7 +38,63 @@ void loadROM () {
 }
 
 // **************************************************************************************
+void define_ByteData ( int* bydt ) {
+    int m = 1;
+    if ( ( Address >= starting_ROM_address ) & ( Address <= sixtyfourK ) ) {
+        int X = ROM[Address - starting_ROM_address];
+        printf ( " %x", X );
+        for ( int i=0; i<8; i++ ) {
+            bydt[i] = ( X & m ) ? 1 : 0;
+            m = m << 1;
+        }
+        return;
+    }
+
+
+    int X = RAM[Address];
+printf("\nram: %x.%x\n", X, Address);
+    for ( int i=0; i<8; i++ ) {
+        bydt[i] = ( X & m ) ? 1 : 0;
+        m = m << 1;
+    }
+}
+
+// **************************************************************************************
 void Write_Mode ( int* gpios ) {
+
+    char value_str[3];
+    char buff[256];
+    int fds[8];
+    int a, b = 0;
+    for ( int i = 7; i < 15; i++ ) {
+        sprintf ( buff, "/sys/class/gpio/gpio%d/direction", gpios[i] );
+        fds[i - 7] = open ( buff, O_WRONLY );
+        if ( write ( fds[i - 7], "in", 3 ) != 3 ) {
+            perror ( "Error in address direction" );
+            exit ( 1 );
+        }
+
+        sprintf ( buff, "/sys/class/gpio/gpio%d/value", gpios[i] );
+        fds[i - 7] = open ( buff, O_RDONLY );
+        if ( -1 == fds[i - 7] ) {
+            fprintf ( stderr, "Failed to open gpio value for reading!\n" );
+            exit ( 1 );
+        }
+        if ( -1 == read ( fds[i - 7], value_str, 3 ) ) {
+            fprintf ( stderr, "Failed to read value!\n" );
+            exit ( 1 );
+        }
+        a = atoi ( value_str ) ? 1 : 0;
+        printf("\n-%x", a);
+        b += a;
+        b = b << 1;
+    }
+    b = b >> 1;
+
+    printf ( " .%x.%x", b, Address );
+
+    for ( int i = 0; i < 8; i++ ) close ( fds[i] );
+
 }
 
 // **************************************************************************************
@@ -45,7 +105,7 @@ void Read_Mode ( int* gpios ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/direction", gpios[i] );
         fd = open ( buff, O_WRONLY );
         if ( fd == -1 ) {
-            perror ( "DataPhase1 open error" );
+            perror ( "DataPhase open error" );
             exit ( 1 );
         }
         if ( write ( fd, "out", 3 ) != 3 ) {
@@ -56,14 +116,14 @@ void Read_Mode ( int* gpios ) {
     }
 
 
-    printf("\n>%d<", Address);
     int DataPhase_fds[8];
-    int ByteData[] = { 0, 1, 0, 1, 0, 1, 1, 1 };
+    int ByteData[8];
+    define_ByteData ( ByteData );
     for ( int i = 7; i < 15; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/value", gpios[i] );
         DataPhase_fds[i - 7] = open ( buff, O_WRONLY );
         if ( DataPhase_fds[i - 7] == -1 ) {
-            perror ( "DataPhase1 value error" );
+            perror ( "DataPhase value error" );
             exit ( 1 );
         }
         sprintf ( buff, "%d", ByteData[i - 7] );
@@ -78,6 +138,7 @@ void Read_Mode ( int* gpios ) {
 
 // **************************************************************************************
 void DataPhase ( int* gpios ) {
+    printf("d");
     if ( Signals[6] )
         Read_Mode ( gpios );
     else
@@ -139,7 +200,7 @@ void AddressPhase ( int* gpios ) {
     }
 
     Address = ( b << 15 ) + addr;
-    printf ( " %06x", Address );
+    printf ( " a%06x", Address );
 
     for ( int i = 0; i < 8; i++ ) close ( fds[i] );
 }

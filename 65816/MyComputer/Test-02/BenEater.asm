@@ -1,4 +1,4 @@
-   * = $8000
+   * = $c000
 
 reset:
    lda #$ff
@@ -15,6 +15,6 @@ loop:
 TheEnd
 
    * = $fffc
-   .dsb (* - TheEnd), 0
+   .dsb (* - TheEnd), $ea
    .word reset 
    .word $0000
