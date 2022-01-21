@@ -15,7 +15,7 @@
 
 #include <math.h>
 
-int clk, fi2c, Address, RWB = 0;
+int clk, fi2c, Address;
 int TicToc = 0;  // Tic = 1, Toc = 0
 int Signals[7] = { 0, 0, 0, 0, 0, 0, 0};
 
@@ -50,18 +50,18 @@ void define_ByteData ( int* bydt ) {
         return;
     }
 
-    if ( Address < starting_ROM_address ) {
-        int X = RAM[Address];
-        printf ( "\nram: %x.%x\n", X, Address );
-        for ( int i=0; i<8; i++ ) {
-            bydt[i] = ( X & m ) ? 1 : 0;
-            m = m << 1;
-        }
+
+    int X = RAM[Address];
+    printf ( "\nram: %x.%x\n", X, Address );
+    for ( int i=0; i<8; i++ ) {
+        bydt[i] = ( X & m ) ? 1 : 0;
+        m = m << 1;
     }
 }
 
 // **************************************************************************************
 void Write_Mode ( int* gpios ) {
+    /*
         char value_str[3];
         char buff[256];
         int fds[8];
@@ -85,14 +85,16 @@ void Write_Mode ( int* gpios ) {
                 exit ( 1 );
             }
             a = atoi ( value_str ) ? 1 : 0;
+            printf("\n-%x", a);
             b += a;
             b = b << 1;
         }
         b = b >> 1;
 
-        printf ( " %02x", b );
+        printf ( " .%x.%x", b, Address );
 
         for ( int i = 0; i < 8; i++ ) close ( fds[i] );
+    */
 }
 
 // **************************************************************************************
@@ -103,7 +105,7 @@ void Read_Mode ( int* gpios ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/direction", gpios[i] );
         fd = open ( buff, O_WRONLY );
         if ( fd == -1 ) {
-            perror ( "Read_Mode open error" );
+            perror ( "DataPhase open error" );
             exit ( 1 );
         }
         if ( write ( fd, "out", 3 ) != 3 ) {
@@ -121,12 +123,12 @@ void Read_Mode ( int* gpios ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/value", gpios[i] );
         DataPhase_fds[i - 7] = open ( buff, O_WRONLY );
         if ( DataPhase_fds[i - 7] == -1 ) {
-            perror ( "Read_Mode value error" );
+            perror ( "DataPhase value error" );
             exit ( 1 );
         }
         sprintf ( buff, "%d", ByteData[i - 7] );
         if ( write ( DataPhase_fds[i - 7], buff, 1 ) != 1 ) {
-            perror ( "Read_Mode assign value error" );
+            perror ( "DataPhase assign value error" );
             exit ( 1 );
         }
     }
@@ -137,10 +139,12 @@ void Read_Mode ( int* gpios ) {
 // **************************************************************************************
 void DataPhase ( int* gpios ) {
     printf ( " %06x", Address );
-    if ( RWB )
+    /*
+    if ( Signals[6] )
         Read_Mode ( gpios );
     else
         Write_Mode ( gpios );
+    */
 }
 
 // **************************************************************************************
@@ -260,9 +264,9 @@ void HardwarePhase ( int* gpios ) {
         exit ( 1 );
     }
     display_Signals ( gpios );
-    RWB = Signals[6];
     AddressPhase ( gpios );
     usleep ( 50000 * 3 );
+
 }
 
 // **************************************************************************************
