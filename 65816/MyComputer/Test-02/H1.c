@@ -329,7 +329,7 @@ void export_CLK() {
         exit ( 1 );
     }
 
-    if ( write ( fd, "6", 2 ) != 2 ) {
+    if ( write ( fd, "27", 2 ) != 2 ) {
         perror ( "Error writing to clock" );
         exit ( 1 );
     }
@@ -338,7 +338,7 @@ void export_CLK() {
 
 
     printf ( "set_direction\n" );
-    fd = open ( "/sys/class/gpio/gpio6/direction", O_WRONLY );
+    fd = open ( "/sys/class/gpio/gpio27/direction", O_WRONLY );
     if ( fd == -1 ) {
         perror ( "Unable to open clock" );
         exit ( 1 );
@@ -360,7 +360,7 @@ void unexport_CLK() {
         exit ( 1 );
     }
 
-    if ( write ( fd, "6", 2 ) != 2 ) {
+    if ( write ( fd, "27", 2 ) != 2 ) {
         perror ( "Error writing to /sys/class/gpio/unexport" );
         exit ( 1 );
     }
@@ -486,8 +486,8 @@ void close_BAs ( int* gpios ) {
 int main ( void ) {
     int GPIOs[15] = {
         13, 19, 26,       // VPB, MLB, VPA
-        14, 15, 18, 23,   // VDA, MX, E, RWB
-        24, 25,  8,  7,   // D0, D1, D2, D3
+        14, 17, 18, 23,   // VDA, MX, E, RWB
+        24, 25, 22, 10,   // D0, D1, D2, D3
         12, 16, 20, 21    // D4, D5, D6, D7
     };
 
@@ -507,7 +507,7 @@ int main ( void ) {
     export_BAs ( GPIOs );
 
     printf ( "Press [ESC] to quit.\n" );
-    clk = open ( "/sys/class/gpio/gpio6/value", O_WRONLY );
+    clk = open ( "/sys/class/gpio/gpio27/value", O_WRONLY );
     if ( clk == -1 ) {
         perror ( "EEK: Unable to open clock." );
         exit ( 1 );
