@@ -17,7 +17,17 @@
 
 int clk, fi2c, Address, RWB = 0;
 int TicToc = 0;  // Tic = 1, Toc = 0
-int Signals[7] = { 0, 0, 0, 0, 0, 0, 0};
+
+#define signal_elements 1
+int Signals[signal_elements] = {
+    19  // RWB
+};
+/*
+VPB, MLB, VPA
+VDA, MX, E, RWB
+*/
+
+#define sleep usleep ( 50000 * 3 )
 
 #define ROM_size 32768
 #define RAM_size 32768
@@ -75,39 +85,39 @@ void define_ByteData ( int* bydt ) {
 }
 
 // **************************************************************************************
-void Write_Mode () {
-    /*
-        if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
-            perror ( "Failed to connect to 20 in mode_Write.\n" );
-            return;
-        }
-
-        char config[1];
-        config[0] = 0xff;
-        write ( fi2c, config, 1 );
-
-        char buf[1];
-        if ( read ( fi2c, buf, 5 ) != 5 ) {
-            perror ( "Failed to read in the buffer\n" );
-            return;
-        }
-
-        int relROMaddr = Address - starting_ROM_address;
-        printf ( " %06x.%d", Address, relROMaddr );
-        printf ( "/%x/", buf[0] );
-    */
-}
-
-// **************************************************************************************
-void Read_Mode () {
-    /*
+void save_CPU_datum() {
     if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
-        perror ( "Failed to connect to 3c\n" );
+        perror ( "Failed to connect to 20 in mode_Write.\n" );
+        return;
+    }
+
+    char config[1];
+    config[0] = 0xff;
+    write ( fi2c, config, 1 );
+
+    TIC();
+    sleep;
+
+    char buf[1];
+    if ( read ( fi2c, buf, 5 ) != 5 ) {
+        perror ( "Failed to read in the buffer\n" );
         return;
     }
 
     int relROMaddr = Address - starting_ROM_address;
+    printf ( " %06x.%d", Address, relROMaddr );
+    printf ( "/%x/", buf[0] );
+}
+
+// **************************************************************************************
+void set_CPU_Read() {
+    int relROMaddr = Address - starting_ROM_address;
     printf ( " %06x", Address );
+
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
+        perror ( "Failed to connect to 20\n" );
+        return;
+    }
 
     if ( ( Address >= starting_ROM_address ) & ( Address <= sixtyfourK ) ) {
         printf ( ":%02x", ROM[relROMaddr] );
@@ -121,45 +131,10 @@ void Read_Mode () {
         if ( write ( fi2c, fish, 1 ) != 1 )
             perror ( "Failed to write to PCF\n" );
     }
-    */
 }
 
 // **************************************************************************************
-void DataPhase () {
-    int fi2c;
-    printf ( " NOP" );
-
-    if ( ( fi2c = open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
-        perror ( "failed to open the bus\n" );
-        return;
-    }
-
-
-
-    if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
-        perror ( "Failed to connect to 20\n" );
-        return;
-    }
-
-    char fish[1] = {0xea};
-    if ( write ( fi2c, fish, 1 ) != 1 )
-        perror ( "Failed to write to PCF\n" );
-
-
-    close ( fi2c );
-
-
-    /*
-    if ( RWB ) {
-        Read_Mode();
-    } else {
-        Write_Mode();
-    }
-    */
-}
-
-// **************************************************************************************
-void AddressPhase () {
+void get_Address () {
     char buf[5] = {'a', 'a', 'a', 'a', 0};
     int addr;
 
@@ -202,14 +177,13 @@ void AddressPhase () {
 }
 
 // **************************************************************************************
-void display_Signals ( int* gpios ) {
-    const int elements = 1;   // GPIOs
+void get_Signals () {
     char value_str[3];
     int fd;
     char buff[256];
 
-    for ( int i = 0; i < elements; i++ ) {
-        sprintf ( buff, "/sys/class/gpio/gpio%d/value", gpios[i] );
+    for ( int i = 0; i < signal_elements; i++ ) {
+        sprintf ( buff, "/sys/class/gpio/gpio%d/value", Signals[i] );
         fd = open ( buff, O_RDONLY );
         if ( -1 == fd ) {
             fprintf ( stderr, "Failed to open gpio value for reading!\n" );
@@ -221,9 +195,10 @@ void display_Signals ( int* gpios ) {
         }
         close ( fd );
 
-        if ( i == 0 )
+        if ( i == 0 ) {
             printf ( " %s", atoi ( value_str ) ? "r" : "W" );
-        else if ( i == 5 )
+            RWB = atoi ( value_str );
+        } else if ( i == 5 )
             printf ( " %s", atoi ( value_str ) ? "E" : "-" );
         else if ( i == 2 )
             printf ( " %s", atoi ( value_str ) ? "VPA" : "---" );
@@ -238,20 +213,19 @@ void display_Signals ( int* gpios ) {
 }
 
 // **************************************************************************************
-void HardwarePhase ( int* gpios ) {
+void HardwarePhase () {
     TOC();
-    display_Signals ( gpios );
-    AddressPhase ();
-    usleep ( 50000 * 3 );
-
-    /*
-       DataPhase ();
-       TIC();
-       usleep ( 50000 * 3 );
-       */
+    sleep;
+    get_Signals ();
+    get_Address ();
 
 
-
+    if ( RWB ) {
+        set_CPU_Read();
+        TIC();
+    } else {
+        save_CPU_datum();
+    }
 }
 
 // **************************************************************************************
@@ -289,6 +263,9 @@ void export_CLK() {
 
 // --------------------------------------------------------------------------------------
 void TIC() {
+    /*
+     * from LOW to HIGH
+     */
     TicToc = 1;
     printf ( "\nTic:" );
 
@@ -300,6 +277,9 @@ void TIC() {
 
 // --------------------------------------------------------------------------------------
 void TOC() {
+    /*
+     * from HIGH to Low
+     */
     TicToc = 0;
     printf ( "\nToc:" );
 
@@ -336,8 +316,7 @@ void open_i2c() {
 }
 
 // **************************************************************************************
-void export_Signals ( int* gpios ) {
-    const int elements = 1;   // GPIOs
+void export_Signals () {
     int fd;
     printf ( "export_Signals\n" );
     printf ( "   opening...\n" );
@@ -349,8 +328,8 @@ void export_Signals ( int* gpios ) {
     }
 
     char snum[5];
-    for ( int i = 0; i < elements; i++ ) {
-        sprintf ( snum, "%d", gpios[i] );
+    for ( int i = 0; i < signal_elements; i++ ) {
+        sprintf ( snum, "%d", Signals[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
             perror ( "   Error writing to signals" );
             exit ( 1 );
@@ -361,9 +340,9 @@ void export_Signals ( int* gpios ) {
 
 
     char buff[256];
-    int fds[elements];
-    for ( int i = 0; i < elements; i++ ) {
-        sprintf ( buff, "/sys/class/gpio/gpio%d/direction", gpios[i] );
+    int fds[signal_elements];
+    for ( int i = 0; i < signal_elements; i++ ) {
+        sprintf ( buff, "/sys/class/gpio/gpio%d/direction", Signals[i] );
         fds[i] = open ( buff, O_WRONLY );
         if ( write ( fds[i], "in", 3 ) != 3 ) {
             perror ( "Error in signal direction" );
@@ -375,9 +354,8 @@ void export_Signals ( int* gpios ) {
 }
 
 // --------------------------------------------------------------------------------------
-void close_Signals ( int* gpios ) {
+void close_Signals () {
     printf ( "unexport Signals\n" );
-    const int elements = 1;   // GPIOs
     int fd;
 
     fd = open ( "/sys/class/gpio/unexport", O_WRONLY );
@@ -387,8 +365,8 @@ void close_Signals ( int* gpios ) {
     }
 
     char snum[5];
-    for ( int i = 0; i < elements; i++ ) {
-        sprintf ( snum, "%d", gpios[i] );
+    for ( int i = 0; i < signal_elements; i++ ) {
+        sprintf ( snum, "%d", Signals[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
             perror ( "Error closing signals" );
             exit ( 1 );
@@ -400,17 +378,6 @@ void close_Signals ( int* gpios ) {
 
 // **************************************************************************************
 int main ( void ) {
-    int Signals[1] = {
-        19  // RWB
-    };
-
-    /*
-    VPB, MLB, VPA
-    VDA, MX, E, RWB
-    */
-
-
-
     struct termios orig_term, raw_term;
     tcgetattr ( STDIN_FILENO, &orig_term );
     raw_term = orig_term;
@@ -422,7 +389,7 @@ int main ( void ) {
     loadROM();
     export_CLK();
     open_i2c();
-    export_Signals ( Signals );
+    export_Signals ();
 
 
     printf ( "Press [ESC] to quit.\n" );
@@ -449,20 +416,20 @@ int main ( void ) {
 
         if ( pressed == 'p' ) {
             if ( again ) {
-                HardwarePhase ( Signals );
+                HardwarePhase ();
                 again = 0;
             }
             continue;
         }
 
-        HardwarePhase ( Signals );
+        HardwarePhase ();
 
     } while ( ch != 27 );
 
     close ( clk );
 
     unexport_CLK();
-    close_Signals ( Signals );
+    close_Signals ();
     close ( fi2c );
 
 
