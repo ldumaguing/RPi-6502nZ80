@@ -15,7 +15,7 @@
 
 #include <math.h>
 
-int clk, Address, RWB = 0;
+int clk, fi2c, Address, RWB = 0;
 int TicToc = 0;  // Tic = 1, Toc = 0
 int Signals[7] = { 0, 0, 0, 0, 0, 0, 0};
 
@@ -26,7 +26,8 @@ int Signals[7] = { 0, 0, 0, 0, 0, 0, 0};
 char ROM[ROM_size];
 char RAM[RAM_size];
 
-void close_BAs ( int* );
+void TIC();
+void TOC();
 
 // **************************************************************************************
 void loadROM () {
@@ -160,13 +161,7 @@ void DataPhase () {
 // **************************************************************************************
 void AddressPhase () {
     char buf[5] = {'a', 'a', 'a', 'a', 0};
-    int addr, fi2c;
-
-
-    if ( ( fi2c = open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
-        perror ( "failed to open the bus\n" );
-        return;
-    }
+    int addr;
 
 
     if ( ioctl ( fi2c, I2C_SLAVE, 0x21 ) < 0 ) {
@@ -204,8 +199,6 @@ void AddressPhase () {
 
     Address = addr;
     printf ( " %06x", Address );
-
-    close ( fi2c );
 }
 
 // **************************************************************************************
@@ -246,32 +239,16 @@ void display_Signals ( int* gpios ) {
 
 // **************************************************************************************
 void HardwarePhase ( int* gpios ) {
-    // ******************** TOC
-    TicToc = 0;
-    printf ( "\nToc:" );
-
-    if ( write ( clk, "0", 1 ) != 1 ) {
-        perror ( "Error writing to clock" );
-        exit ( 1 );
-    }
+    TOC();
     display_Signals ( gpios );
-    //RWB = Signals[6];
     AddressPhase ();
     usleep ( 50000 * 3 );
 
-
-    DataPhase ();
-    // ******************** TIC
-    TicToc = 1;
-    printf ( "\nTic:" );
-
-    if ( write ( clk, "1", 1 ) != 1 ) {
-        perror ( "Error writing to clock" );
-        exit ( 1 );
-    }
-    // display_Signals ( gpios );
-    usleep ( 50000 * 3 );
-
+    /*
+       DataPhase ();
+       TIC();
+       usleep ( 50000 * 3 );
+       */
 
 
 
@@ -310,6 +287,29 @@ void export_CLK() {
     close ( fd );
 }
 
+// --------------------------------------------------------------------------------------
+void TIC() {
+    TicToc = 1;
+    printf ( "\nTic:" );
+
+    if ( write ( clk, "1", 1 ) != 1 ) {
+        perror ( "Error writing to clock" );
+        exit ( 1 );
+    }
+}
+
+// --------------------------------------------------------------------------------------
+void TOC() {
+    TicToc = 0;
+    printf ( "\nToc:" );
+
+    if ( write ( clk, "0", 1 ) != 1 ) {
+        perror ( "Error writing to clock" );
+        exit ( 1 );
+    }
+}
+
+// --------------------------------------------------------------------------------------
 void unexport_CLK() {
     printf ( "unexport_CLK\n" );
     int fd = open ( "/sys/class/gpio/unexport", O_WRONLY );
@@ -328,77 +328,11 @@ void unexport_CLK() {
 
 // **************************************************************************************
 void open_i2c() {
-    /*
     if ( ( fi2c = open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
         perror ( "failed to open the bus\n" );
         return;
     }
     printf ( "Opened i2c, %d\n", fi2c );
-    */
-}
-
-// **************************************************************************************
-void export_Addresses ( int* gpios ) {
-
-    int fd;
-    printf ( "export_Addresses\n" );
-    printf ( "   opening...\n" );
-
-    fd = open ( "/sys/class/gpio/export", O_WRONLY );
-    if ( fd == -1 ) {
-        perror ( "Unable to open /sys/class/gpio/export" );
-        exit ( 1 );
-    }
-
-    char snum[5];
-    for ( int i = 7; i < 23; i++ ) {
-        printf ( "\n%d", gpios[i] );
-        sprintf ( snum, "%d", gpios[i] );
-        if ( write ( fd, snum, 2 ) != 2 ) {
-            perror ( "   Error writing to Addresses" );
-            exit ( 1 );
-        }
-    }
-    close ( fd );
-
-
-
-    char buff[256];
-    int fds[7];
-
-    for ( int i = 7; i < 23; i++ ) {
-        sprintf ( buff, "/sys/class/gpio/gpio%d/direction", gpios[i] );
-        fds[i] = open ( buff, O_WRONLY );
-        if ( write ( fds[i], "in", 3 ) != 3 ) {
-            perror ( "Error in Addresses direction" );
-            exit ( 1 );
-        }
-    }
-
-    //for ( int i = 7; i < 23; i++ ) close ( fds[i] );
-
-}
-
-void close_Addresses ( int* gpios ) {
-    printf ( "unexport Addresses\n" );
-    int fd;
-
-    fd = open ( "/sys/class/gpio/unexport", O_WRONLY );
-    if ( fd == -1 ) {
-        perror ( "Unable to open /sys/class/gpio/unexport" );
-        exit ( 1 );
-    }
-
-    char snum[5];
-    for ( int i = 7; i < 23; i++ ) {
-        sprintf ( snum, "%d", gpios[i] );
-        if ( write ( fd, snum, 2 ) != 2 ) {
-            perror ( "Error closing signals" );
-            exit ( 1 );
-        }
-    }
-
-    close ( fd );
 }
 
 // **************************************************************************************
@@ -440,6 +374,7 @@ void export_Signals ( int* gpios ) {
     //for ( int i = 0; i < 7; i++ ) close ( fds[i] );
 }
 
+// --------------------------------------------------------------------------------------
 void close_Signals ( int* gpios ) {
     printf ( "unexport Signals\n" );
     const int elements = 1;   // GPIOs
@@ -465,7 +400,7 @@ void close_Signals ( int* gpios ) {
 
 // **************************************************************************************
 int main ( void ) {
-    int GPIOs[1] = {
+    int Signals[1] = {
         19  // RWB
     };
 
@@ -486,9 +421,9 @@ int main ( void ) {
 
     loadROM();
     export_CLK();
-    // open_i2c();
-    export_Signals ( GPIOs );
-    //export_Addresses ( GPIOs );
+    open_i2c();
+    export_Signals ( Signals );
+
 
     printf ( "Press [ESC] to quit.\n" );
     clk = open ( "/sys/class/gpio/gpio26/value", O_WRONLY );
@@ -514,22 +449,21 @@ int main ( void ) {
 
         if ( pressed == 'p' ) {
             if ( again ) {
-                HardwarePhase ( GPIOs );
+                HardwarePhase ( Signals );
                 again = 0;
             }
             continue;
         }
 
-        HardwarePhase ( GPIOs );
+        HardwarePhase ( Signals );
 
     } while ( ch != 27 );
 
     close ( clk );
 
     unexport_CLK();
-    close_Signals ( GPIOs );
-    //close_Addresses ( GPIOs );
-    // close ( fi2c );
+    close_Signals ( Signals );
+    close ( fi2c );
 
 
     while ( read ( STDIN_FILENO, &ch, 1 ) == 1 );
