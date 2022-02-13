@@ -15,13 +15,15 @@
 
 #include <math.h>
 
-int clk, fi2c, Address, RWB = 0;
+int clk, RWB = 0;
 int TicToc = 0;  // Tic = 1, Toc = 0
+int Address, fi2c;
 
 int GPIOs[] = {
-    19, 10,  9, 11,                  // RWB, SYNC, MLB, VPB
+    19, 22, 10, 9,                   // RWB, E, MX, VDA
+    4, 17, 27,                       // VPB, MLB, VPA
     21, 20, 16, 12, 7, 8, 25, 24,    // a0 to a7
-    23, 18, 15, 14, 4, 17, 27, 22    // a8 to a15
+    23, 18, 15, 14, 11, 5, 6, 13     // a8 to a15
 };
 
 #define sleep usleep ( 50000 * 3 )
@@ -112,16 +114,17 @@ void save_CPU_datum() {
 }
 
 // **************************************************************************************
-void set_CPU_Read() {
+void set_CPU_Read() {   // write to CPU
     int relROMaddr = Address - starting_ROM_address;
 
+    /*
     int fi2c;
 
     if ( ( fi2c = open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
         perror ( "failed to open the bus\n" );
         return;
     }
-
+    */
 
 
     if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
@@ -136,30 +139,32 @@ void set_CPU_Read() {
 
 
 
+
+    if ( ( Address >= starting_ROM_address ) & ( Address <= sixtyfourK ) ) {
+        printf ( " %02x", ROM[relROMaddr] );
+        char fish[1];
+        fish[0] = ROM[relROMaddr];
+        if ( write ( fi2c, fish, 1 ) != 1 )
+            perror ( "Failed to write to PCF\n" );
+    } else {
+        /*
+        printf ( " NOP" );
+        char fish[1];
+        fish[0] = ( char ) 234;  // NOP
+        if ( write ( fi2c, fish, 1 ) != 1 )
+            perror ( "Failed to write to PCF\n" );
+        */
+    }
+
+
     /*
-      if ( ( Address >= starting_ROM_address ) & ( Address <= sixtyfourK ) ) {
-          printf ( " %02x", ROM[relROMaddr] );
-          char fish[1];
-          fish[0] = ROM[relROMaddr];
-          if ( write ( fi2c, fish, 1 ) != 1 )
-              perror ( "Failed to write to PCF\n" );
-      } else {
-          printf (" NOP");
-          char fish[1];
-          fish[0] = ( char ) 234;  // NOP
-          if ( write ( fi2c, fish, 1 ) != 1 )
-              perror ( "Failed to write to PCF\n" );
-      }
-     */
-
-
     printf ( " NOP" );
     char fish[1];
     fish[0] = ( char ) 234;  // NOP
     if ( write ( fi2c, fish, 1 ) != 1 )
         perror ( "Failed to write to PCF\n" );
-
-    close ( fi2c );
+    */
+    // close ( fi2c );
 }
 
 // **************************************************************************************
@@ -169,7 +174,7 @@ void get_Address () {
     char buff[256];
     printf ( " " );
     int addr = 0;
-    for ( int i = 4; i < 20; i++ ) {
+    for ( int i = 7; i < 23; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/value", GPIOs[i] );
         fd = open ( buff, O_RDONLY );
         if ( -1 == fd ) {
@@ -181,12 +186,42 @@ void get_Address () {
             exit ( 1 );
         }
         close ( fd );
-        
-        addr += (atoi ( value_str ) << (i - 4));
+
+        addr += ( atoi ( value_str ) << ( i - 7 ) );
     }
-    
+
+
+
+
+
+    /*
+        int fi2c;
+        if ( ( fi2c = open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
+            perror ( "failed to open the bus\n" );
+            return;
+        }
+        */
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
+        perror ( "Failed to connect to 20\n" );
+        return;
+    }
+    char config[1];
+    config[0] = 0x00;
+    write ( fi2c, config, 1 );
+
+    char buf[1] = {'x'};
+    if ( read ( fi2c, buf, 5 ) != 5 ) {
+        perror ( "Failed to read in the buffer\n" );
+        return;
+    }
+
+    // close ( fi2c );
+
+
+    addr = addr + ( atoi ( buff ) << 16 );
+
     Address = addr;
-    printf("%04x", Address);
+    printf ( "%06x", Address );
 }
 
 // **************************************************************************************
@@ -195,7 +230,7 @@ void get_Signals () {
     int fd;
     char buff[256];
     printf ( " " );
-    for ( int i = 0; i < 4; i++ ) {
+    for ( int i = 0; i < 7; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/value", GPIOs[i] );
         fd = open ( buff, O_RDONLY );
         if ( -1 == fd ) {
@@ -217,11 +252,37 @@ void get_Signals () {
 void HardwarePhase () {
     TOC();
     sleep;
-    TIC();
-
     get_Signals ();
     get_Address ();
+
+
+
+    if ( GPIOs[0] ) {
+        set_CPU_Read();
+    } else {
+
+        if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
+            perror ( "Failed to connect to 20\n" );
+            return;
+        }
+
+
+        char config[1];
+        config[0] = 0x00;
+        write ( fi2c, config, 1 );
+
+
+
+
+    }
+
+
+
     sleep;
+    TIC();
+
+
+
     /*
     TOC();
     sleep;
@@ -342,7 +403,7 @@ void export_GPIOs () {
     }
 
     char snum[5];
-    for ( int i = 0; i < 20; i++ ) {
+    for ( int i = 0; i < 23; i++ ) {
         sprintf ( snum, "%d", GPIOs[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
             perror ( "   Error writing to signals" );
@@ -354,8 +415,8 @@ void export_GPIOs () {
 
 
     char buff[256];
-    int fds[20];
-    for ( int i = 0; i < 20; i++ ) {
+    int fds[23];
+    for ( int i = 0; i < 23; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/direction", GPIOs[i] );
         fds[i] = open ( buff, O_WRONLY );
         if ( write ( fds[i], "in", 3 ) != 3 ) {
@@ -364,6 +425,7 @@ void export_GPIOs () {
         }
     }
 
+    printf ( "\n" );
     //for ( int i = 0; i < 7; i++ ) close ( fds[i] );
 }
 
@@ -379,7 +441,7 @@ void close_GPIOs () {
     }
 
     char snum[5];
-    for ( int i = 0; i < 20; i++ ) {
+    for ( int i = 0; i < 23; i++ ) {
         sprintf ( snum, "%d", GPIOs[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
             perror ( "Error closing signals" );
