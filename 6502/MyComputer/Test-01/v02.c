@@ -26,12 +26,12 @@ int GPIOs[] = {
 
 #define sleep usleep ( 50000 * 3 )
 
-#define ROM_size 32768
-#define RAM_size 32768
-#define starting_ROM_address 32768   // 8000
+#define ROM_size 16384
+#define RAM_size 49152
+#define starting_ROM_address 49152   // C000
 #define sixtyfourK 65536
-char ROM[ROM_size];
-char RAM[RAM_size];
+unsigned char ROM[ROM_size];
+unsigned char RAM[RAM_size];
 
 void TIC();
 void TOC();
@@ -43,72 +43,6 @@ void loadROM () {
     fp = fopen ( "rom.bin", "rb" );
     fread ( ROM, ROM_size, 1, fp );
     fclose ( fp );
-}
-
-// **************************************************************************************
-void define_ByteData ( int* bydt ) {
-    /*
-        int m = 1;
-        if ( ( Address >= starting_ROM_address ) & ( Address <= sixtyfourK ) ) {
-            int X = ROM[Address - starting_ROM_address];
-            printf ( " ..%04x", X );
-            for ( int i=0; i<8; i++ ) {
-                bydt[i] = ( X & m ) ? 1 : 0;
-                m = m << 1;
-            }
-            return;
-        }
-
-        if ( Address < starting_ROM_address ) {
-            int X = RAM[Address];
-            printf ( " ...%04x", X );
-            for ( int i=0; i<8; i++ ) {
-                bydt[i] = ( X & m ) ? 1 : 0;
-                m = m << 1;
-            }
-        }
-    */
-
-
-    /*
-    int m = 1;
-    int X = 234;
-    printf ( " ...%04x", X );
-    for ( int i=0; i<8; i++ ) {
-        bydt[i] = ( X & m ) ? 1 : 0;
-        m = m << 1;
-    }
-    */
-}
-
-// **************************************************************************************
-void save_CPU_datum() {
-    TIC();
-    sleep;
-
-    /*
-    if ( ioctl ( fi2c, I2C_SLAVE, 0x20 ) < 0 ) {
-        perror ( "Failed to connect to 20 in mode_Write.\n" );
-        return;
-    }
-
-    char config[1];
-    config[0] = 0xff;
-    write ( fi2c, config, 1 );
-
-    TIC();
-    sleep;
-
-    char buf[1];
-    if ( read ( fi2c, buf, 5 ) != 5 ) {
-        perror ( "Failed to read in the buffer\n" );
-        return;
-    }
-
-    int relROMaddr = Address - starting_ROM_address;
-    printf ( " %06x.%d", Address, relROMaddr );
-    printf ( "/%x/", buf[0] );
-    */
 }
 
 // **************************************************************************************
@@ -133,7 +67,9 @@ void CPU_Write() {
         return;
     }
 
-    printf ( " %x %x", Address, buf[0] );
+
+    RAM[Address] = buf[0];
+    printf ( "           %x", RAM[Address] );
 }
 
 // **************************************************************************************
@@ -152,6 +88,7 @@ void CPU_Read() {
         return;
     }
 
+
     if ( ( Address >= starting_ROM_address ) & ( Address <= sixtyfourK ) ) {
         printf ( " %02x", ROM[relROMaddr] );
         char fish[1];
@@ -165,6 +102,9 @@ void CPU_Read() {
         if ( write ( fi2c, fish, 1 ) != 1 )
             perror ( "Failed to write to PCF\n" );
     }
+
+
+    TIC();
 }
 
 // **************************************************************************************
@@ -237,19 +177,17 @@ void get_Signals () {
 // **************************************************************************************
 void HardwarePhase () {
     TOC();
-    sleep;
     get_Signals ();
     get_Address ();
+    sleep;
 
 
     if ( RWB ) {
         CPU_Read();
-        TIC();
-        sleep;
     } else {
         CPU_Write();
-        sleep;
     }
+    sleep;
 }
 
 // **************************************************************************************
@@ -362,7 +300,6 @@ void export_GPIOs () {
     close ( fd );
 
 
-
     char buff[256];
     int fds[20];
     for ( int i = 0; i < 20; i++ ) {
@@ -373,8 +310,6 @@ void export_GPIOs () {
             exit ( 1 );
         }
     }
-
-    //for ( int i = 0; i < 7; i++ ) close ( fds[i] );
 }
 
 // --------------------------------------------------------------------------------------
