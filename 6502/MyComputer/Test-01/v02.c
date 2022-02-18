@@ -24,7 +24,7 @@ int GPIOs[] = {
     23, 18, 15, 14, 4, 17, 27, 22    // a8 to a15
 };
 
-#define sleep usleep ( 50000 )
+#define sleep usleep ( 50000 * 3 )
 
 #define ROM_size 32768
 #define RAM_size 32768
@@ -113,20 +113,10 @@ void save_CPU_datum() {
 
 // **************************************************************************************
 void CPU_Write() {
-/*
-    int fi2cx;
-
-    if ( ( fi2cx = open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
-        perror ( "failed to open the bus\n" );
-        return;
-    }
-
-    if ( ioctl ( fi2cx, I2C_SLAVE, 0x38 ) < 0 ) {
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x38 ) < 0 ) {
         perror ( "Failed to connect to 38\n" );
         return;
     }
-*/
-
     char config[1] = {0xff};
     if ( write ( fi2c, config, 1 ) != 1 ) {
         printf ( "reset the write failed" );
@@ -137,47 +127,30 @@ void CPU_Write() {
     TIC();
 
 
-
-
-    char buf[10];
-    if ( read ( fi2c, buf, 10 ) != 10 ) {
+    char buf[1];
+    if ( read ( fi2c, buf, 1 ) != 1 ) {
         perror ( "Failed to read in the buffer\n" );
         return;
     }
 
-    printf ( ">%x", buf[5] );
-
-
-    sleep;
-
-
-
-//    close ( fi2cx );
+    printf ( " %x %x", Address, buf[0] );
 }
 
 // **************************************************************************************
 void CPU_Read() {
     int relROMaddr = Address - starting_ROM_address;
 
-    /*
-    int fi2c;
-
-    if ( ( fi2c = open ( "/dev/i2c-1", O_RDWR ) ) < 0 ) {
-        perror ( "failed to open the bus\n" );
-        return;
-    }
-    */
     if ( ioctl ( fi2c, I2C_SLAVE, 0x38 ) < 0 ) {
         perror ( "Failed to connect to 38\n" );
         return;
     }
 
 
-    //char config[1] = {0xff};
-    //if ( write ( fi2c, config, 1 ) != 1 ) {
-    //    printf ( "reset the read failed" );
-    //    return;
-    //}
+    char config[1] = {0x00};
+    if ( write ( fi2c, config, 1 ) != 1 ) {
+        printf ( "reset the read failed" );
+        return;
+    }
 
     if ( ( Address >= starting_ROM_address ) & ( Address <= sixtyfourK ) ) {
         printf ( " %02x", ROM[relROMaddr] );
@@ -192,9 +165,6 @@ void CPU_Read() {
         if ( write ( fi2c, fish, 1 ) != 1 )
             perror ( "Failed to write to PCF\n" );
     }
-
-
-    //close ( fi2c );
 }
 
 // **************************************************************************************
@@ -266,16 +236,10 @@ void get_Signals () {
 
 // **************************************************************************************
 void HardwarePhase () {
-
-
     TOC();
     sleep;
     get_Signals ();
     get_Address ();
-
-
-
-
 
 
     if ( RWB ) {
@@ -284,34 +248,8 @@ void HardwarePhase () {
         sleep;
     } else {
         CPU_Write();
-    }
-
-
-
-
-
-
-
-
-
-    /*
-    TOC();
-    sleep;
-    get_Signals ();
-    //get_Address ();
-
-    //sleep;
-    if ( 1 ) {
-
-        //sleep;
-        TIC();
-
-        //set_CPU_Read();
         sleep;
-    } else {
-        save_CPU_datum();
     }
-    */
 }
 
 // **************************************************************************************
