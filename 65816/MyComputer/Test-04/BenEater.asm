@@ -1,7 +1,7 @@
-   * = $8000
+   * = $c000
 
 reset:
-   lda #$ff
+   lda #$fa
    sta $6002
 
 loop:
