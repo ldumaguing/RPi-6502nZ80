@@ -19,7 +19,7 @@ int clk, fi2c, Address, RWB = 0;
 int TicToc = 0;  // Tic = 1, Toc = 0
 
 int GPIOs[] = {
-    19, 26, 21, 13, 6,               // M1, WR, RD, IORQ, MREQ
+    19, 21, 26, 13, 6,               // M1, RD, WR, IORQ, MREQ
     20, 16, 12, 7, 8, 25, 24, 23,    // a0 to a7
     18, 15, 14, 4, 17, 27, 22, 10    // a8 to a15
 };
