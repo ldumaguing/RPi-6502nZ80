@@ -19,12 +19,12 @@ int clk, fi2c, Address, RWB = 0;
 int TicToc = 0;  // Tic = 1, Toc = 0
 
 int GPIOs[] = {
-    19, 26, 21, 13,                  // M1, WR, RD, MREQ
+    19, 26, 21, 13, 6,               // M1, WR, RD, IORQ, MREQ
     20, 16, 12, 7, 8, 25, 24, 23,    // a0 to a7
     18, 15, 14, 4, 17, 27, 22, 10    // a8 to a15
 };
 
-#define sleep usleep ( 50000 * 3 )
+#define sleep usleep ( 50000 )
 
 #define ROM_size 16384
 #define RAM_size 49152
@@ -106,6 +106,26 @@ void CPU_Read() {
 
     TIC();
 }
+// **************************************************************************************
+void set_opcode() {
+    if ( ioctl ( fi2c, I2C_SLAVE, 0x38 ) < 0 ) {
+        perror ( "Failed to connect to 38\n" );
+        return;
+    }
+
+
+    char config[1] = {0x00};
+    if ( write ( fi2c, config, 1 ) != 1 ) {
+        printf ( "reset the read failed" );
+        return;
+    }
+
+
+    char fish[1];
+    fish[0] = ( char ) 0;   // NOP
+    if ( write ( fi2c, fish, 1 ) != 1 )
+        perror ( "Failed to write to PCF\n" );
+}
 
 // **************************************************************************************
 void get_Address() {
@@ -114,7 +134,7 @@ void get_Address() {
     char buff[256];
     printf ( " " );
     int addr = 0;
-    for ( int i = 4; i < 20; i++ ) {
+    for ( int i = 5; i < 21; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/value", GPIOs[i] );
         fd = open ( buff, O_RDONLY );
         if ( -1 == fd ) {
@@ -127,7 +147,7 @@ void get_Address() {
         }
         close ( fd );
 
-        addr += ( atoi ( value_str ) << ( i - 4 ) );
+        addr += ( atoi ( value_str ) << ( i - 5 ) );
     }
 
     Address = addr;
@@ -140,7 +160,7 @@ void get_Signals() {
     int fd;
     char buff[256];
     printf ( " " );
-    for ( int i = 0; i < 4; i++ ) {
+    for ( int i = 0; i < 5; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/value", GPIOs[i] );
         fd = open ( buff, O_RDONLY );
         if ( -1 == fd ) {
@@ -176,7 +196,7 @@ void get_Signals() {
 
 // **************************************************************************************
 void HardwarePhase() {
-    TOC();
+    TIC();
     get_Signals();
     get_Address();
     sleep;
@@ -188,7 +208,7 @@ void HardwarePhase() {
             CPU_Write();
         }
         */
-    TIC();
+    TOC();
     get_Signals();
     get_Address();
     sleep;
@@ -294,7 +314,7 @@ void export_GPIOs() {
     }
 
     char snum[5];
-    for ( int i = 0; i < 20; i++ ) {
+    for ( int i = 0; i < 21; i++ ) {
         printf ( "%d - %d\n", i, GPIOs[i] );
         sprintf ( snum, "%d", GPIOs[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
@@ -307,7 +327,7 @@ void export_GPIOs() {
 
     char buff[256];
     int fds[20];
-    for ( int i = 0; i < 20; i++ ) {
+    for ( int i = 0; i < 21; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/direction", GPIOs[i] );
         fds[i] = open ( buff, O_WRONLY );
         if ( write ( fds[i], "in", 3 ) != 3 ) {
@@ -329,7 +349,7 @@ void close_GPIOs() {
     }
 
     char snum[5];
-    for ( int i = 0; i < 20; i++ ) {
+    for ( int i = 0; i < 21; i++ ) {
         sprintf ( snum, "%d", GPIOs[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
             perror ( "Error closing signals" );
@@ -356,6 +376,7 @@ int main ( void ) {
     open_i2c();
     export_GPIOs();
 
+    set_opcode();
 
     printf ( "Press [ESC] to quit.\n" );
     clk = open ( "/sys/class/gpio/gpio9/value", O_WRONLY );
