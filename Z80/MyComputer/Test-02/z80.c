@@ -19,7 +19,7 @@ int clk, fi2c, Address, RWB = 0;
 int TicToc = 0;  // Tic = 1, Toc = 0
 
 int GPIOs[] = {
-    19, 21, 26, 13, 6,               // M1, RD, WR, IORQ, MREQ
+    19, 21, 26, 13, 6, 5,            // M1, RD, WR, IORQ, MREQ, RFSH
     20, 16, 12, 7, 8, 25, 24, 23,    // a0 to a7
     18, 15, 14, 4, 17, 27, 22, 10    // a8 to a15
 };
@@ -122,7 +122,7 @@ void set_opcode() {
 
 
     char fish[1];
-    fish[0] = ( char ) 0;   // NOP
+    fish[0] = ( char ) 24;   // NOP
     if ( write ( fi2c, fish, 1 ) != 1 )
         perror ( "Failed to write to PCF\n" );
 }
@@ -134,7 +134,7 @@ void get_Address() {
     char buff[256];
     printf ( " " );
     int addr = 0;
-    for ( int i = 5; i < 21; i++ ) {
+    for ( int i = 6; i < 22; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/value", GPIOs[i] );
         fd = open ( buff, O_RDONLY );
         if ( -1 == fd ) {
@@ -147,7 +147,7 @@ void get_Address() {
         }
         close ( fd );
 
-        addr += ( atoi ( value_str ) << ( i - 5 ) );
+        addr += ( atoi ( value_str ) << ( i - 6 ) );
     }
 
     Address = addr;
@@ -160,7 +160,7 @@ void get_Signals() {
     int fd;
     char buff[256];
     printf ( " " );
-    for ( int i = 0; i < 5; i++ ) {
+    for ( int i = 0; i < 6; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/value", GPIOs[i] );
         fd = open ( buff, O_RDONLY );
         if ( -1 == fd ) {
@@ -314,7 +314,7 @@ void export_GPIOs() {
     }
 
     char snum[5];
-    for ( int i = 0; i < 21; i++ ) {
+    for ( int i = 0; i < 22; i++ ) {
         printf ( "%d - %d\n", i, GPIOs[i] );
         sprintf ( snum, "%d", GPIOs[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
@@ -327,7 +327,7 @@ void export_GPIOs() {
 
     char buff[256];
     int fds[20];
-    for ( int i = 0; i < 21; i++ ) {
+    for ( int i = 0; i < 22; i++ ) {
         sprintf ( buff, "/sys/class/gpio/gpio%d/direction", GPIOs[i] );
         fds[i] = open ( buff, O_WRONLY );
         if ( write ( fds[i], "in", 3 ) != 3 ) {
@@ -349,7 +349,7 @@ void close_GPIOs() {
     }
 
     char snum[5];
-    for ( int i = 0; i < 21; i++ ) {
+    for ( int i = 0; i < 22; i++ ) {
         sprintf ( snum, "%d", GPIOs[i] );
         if ( write ( fd, snum, 2 ) != 2 ) {
             perror ( "Error closing signals" );
