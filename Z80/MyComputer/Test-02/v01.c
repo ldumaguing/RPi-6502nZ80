@@ -57,10 +57,6 @@ void CPU_Write() {
         return;
     }
 
-
-    TIC();
-
-
     char buf[1];
     if ( read ( fi2c, buf, 1 ) != 1 ) {
         perror ( "Failed to read in the buffer\n" );
@@ -69,7 +65,7 @@ void CPU_Write() {
 
 
     RAM[Address] = buf[0];
-    printf ( "           %x", RAM[Address] );
+    printf ( "   %x", RAM[Address] );
 }
 
 // **************************************************************************************
@@ -96,26 +92,6 @@ void CPU_Read() {
         if ( write ( fi2c, fish, 1 ) != 1 )
             perror ( "Failed to write to PCF\n" );
     }
-}
-// **************************************************************************************
-void set_opcode() {
-    if ( ioctl ( fi2c, I2C_SLAVE, 0x38 ) < 0 ) {
-        perror ( "Failed to connect to 38\n" );
-        return;
-    }
-
-
-    char config[1] = {0x00};
-    if ( write ( fi2c, config, 1 ) != 1 ) {
-        printf ( "reset the read failed" );
-        return;
-    }
-
-
-    char fish[1];
-    fish[0] = ( char ) 120;   // NOP
-    if ( write ( fi2c, fish, 1 ) != 1 )
-        perror ( "Failed to write to PCF\n" );
 }
 
 // **************************************************************************************
@@ -172,7 +148,7 @@ void get_Signals() {
     Write_Mem_b = signals & 5;
     Read_IO_b = signals & 10;
     Write_IO_b = signals & 6;
-    printf ( "%2x  %x.%x.%x.%x", signals, Read_Mem_b, Write_Mem_b, Read_IO_b, Write_IO_b );
+    printf ( "%2x-%x.%x.%x.%x", signals, Read_Mem_b, Write_Mem_b, Read_IO_b, Write_IO_b );
 }
 
 // **************************************************************************************
@@ -188,7 +164,7 @@ void HardwarePhase() {
     }
 
     if ( Read_Mem_b == 0 ) CPU_Read();
-
+    if ( Write_Mem_b == 0 ) CPU_Write();
 
     sleep;
 }
@@ -228,11 +204,6 @@ void export_CLK() {
 
 // --------------------------------------------------------------------------------------
 void TIC() {
-    /*
-     * from LOW to HIGH
-     */
-    printf ( "\nTic:" );
-
     if ( write ( clk, "1", 1 ) != 1 ) {
         perror ( "Error writing to clock" );
         exit ( 1 );
@@ -241,10 +212,7 @@ void TIC() {
 
 // --------------------------------------------------------------------------------------
 void TOC() {
-    /*
-     * from HIGH to Low
-     */
-    printf ( "\nToc:" );
+    printf ( "\n" );
 
     if ( write ( clk, "0", 1 ) != 1 ) {
         perror ( "Error writing to clock" );
@@ -353,7 +321,6 @@ int main ( void ) {
     open_i2c();
     export_GPIOs();
 
-    //set_opcode();
 
     printf ( "Press [ESC] to quit.\n" );
     clk = open ( "/sys/class/gpio/gpio9/value", O_WRONLY );
