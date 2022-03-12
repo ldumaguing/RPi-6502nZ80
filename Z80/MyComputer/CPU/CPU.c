@@ -78,8 +78,6 @@ void CPU_Read()
         perror("Failed to connect to 38\n");
         return;
     }
-
-
     char config[1] = {0x00};
     if (write(fi2c, config, 1) != 1) {
         printf("reset the read failed");
@@ -94,27 +92,6 @@ void CPU_Read()
         if (write(fi2c, fish, 1) != 1)
             perror("Failed to write to PCF\n");
     }
-}
-// **************************************************************************************
-void set_opcode()
-{
-    if (ioctl(fi2c, I2C_SLAVE, 0x38) < 0) {
-        perror("Failed to connect to 38\n");
-        return;
-    }
-
-
-    char config[1] = {0x00};
-    if (write(fi2c, config, 1) != 1) {
-        printf("reset the read failed");
-        return;
-    }
-
-
-    char fish[1];
-    fish[0] = (char) 120;     // NOP
-    if (write(fi2c, fish, 1) != 1)
-        perror("Failed to write to PCF\n");
 }
 
 // **************************************************************************************
