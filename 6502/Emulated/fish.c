@@ -1359,10 +1359,10 @@ void step(context_t *c) {
 // **************************************************************************************
 // **************************************************************************************
 // **************************************************************************************
-context_t c;
-
 // **************************************************************************************
 int main ( int argc, char *argv[] ) {
+    context_t c;
+    
     c.mem[0xc000] = 0xa9;
     c.mem[0xc001] = 0xff;
     c.mem[0xc002] = 0x8d;
@@ -1390,10 +1390,13 @@ int main ( int argc, char *argv[] ) {
 
     reset6502 ( &c );
 
+    printf ( "%x.%x.%x.%x.%x.%x.%x.%x\n", c.a, c.x, c.y, c.flags, c.clockticks, c.ea, c.opcode, c.pc );
+    reset6502 ( &c );
+    printf ( "%x.%x.%x.%x.%x.%x.%x.%x\n", c.a, c.x, c.y, c.flags, c.clockticks, c.ea, c.opcode, c.pc );
+    step ( &c );
+    printf ( "%x.%x.%x.%x.%x.%x.%x.%x\n", c.a, c.x, c.y, c.flags, c.clockticks, c.ea, c.opcode, c.pc );
+    printf ( "%x.%x\n", c.mem[0xfffc], c.mem[0xfffd] );
 
-
-    // uint8_t mem_read ( uint16_t address );
-    // void mem_write ( uint16_t address, uint8_t value );
 
     return 0;
 }
