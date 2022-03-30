@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ayeka/projects/Fake6502/Myne/myne.h
+stdint.h
+-
+
+/home/ayeka/projects/Fake6502/main.c
+stdio.h
+-
+stdlib.h
+-
+stdint.h
+-
+stdbool.h
+-
+Myne/myne.h
+/home/ayeka/projects/Fake6502/Myne/myne.h
+

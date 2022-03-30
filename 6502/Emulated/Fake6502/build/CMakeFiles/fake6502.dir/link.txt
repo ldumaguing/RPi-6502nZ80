@@ -1,0 +1,1 @@
+/usr/bin/cc -O3 -DNDEBUG -rdynamic CMakeFiles/fake6502.dir/main.c.o -o fake6502  libmyne.a 
