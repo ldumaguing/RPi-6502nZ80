@@ -42,7 +42,8 @@
 			"language" : "C",
 			"sourceIndexes" : 
 			[
-				1
+				1,
+				2
 			]
 		}
 	],
@@ -67,7 +68,8 @@
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
-				1
+				1,
+				2
 			]
 		}
 	],
@@ -82,6 +84,12 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "Myne/fake6502.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "Myne/my6502.c",
 			"sourceGroupIndex" : 1
 		}
 	],

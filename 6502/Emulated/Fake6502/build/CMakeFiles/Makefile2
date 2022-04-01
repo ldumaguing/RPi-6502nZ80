@@ -95,12 +95,12 @@ clean: CMakeFiles/fake6502.dir/clean
 CMakeFiles/myne.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/myne.dir/build.make CMakeFiles/myne.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/myne.dir/build.make CMakeFiles/myne.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ayeka/projects/Fake6502/build/CMakeFiles --progress-num=3,4 "Built target myne"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/ayeka/projects/Fake6502/build/CMakeFiles --progress-num=3,4,5 "Built target myne"
 .PHONY : CMakeFiles/myne.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/myne.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayeka/projects/Fake6502/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayeka/projects/Fake6502/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/myne.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayeka/projects/Fake6502/build/CMakeFiles 0
 .PHONY : CMakeFiles/myne.dir/rule
@@ -127,7 +127,7 @@ CMakeFiles/fake6502.dir/all: CMakeFiles/myne.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/fake6502.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayeka/projects/Fake6502/build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayeka/projects/Fake6502/build/CMakeFiles 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/fake6502.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/ayeka/projects/Fake6502/build/CMakeFiles 0
 .PHONY : CMakeFiles/fake6502.dir/rule

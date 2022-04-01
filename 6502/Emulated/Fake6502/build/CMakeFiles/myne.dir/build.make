@@ -89,17 +89,32 @@ CMakeFiles/myne.dir/Myne/fake6502.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/myne.dir/Myne/fake6502.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/ayeka/projects/Fake6502/Myne/fake6502.c -o CMakeFiles/myne.dir/Myne/fake6502.c.s
 
+CMakeFiles/myne.dir/Myne/my6502.c.o: CMakeFiles/myne.dir/flags.make
+CMakeFiles/myne.dir/Myne/my6502.c.o: ../Myne/my6502.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ayeka/projects/Fake6502/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/myne.dir/Myne/my6502.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/myne.dir/Myne/my6502.c.o -c /home/ayeka/projects/Fake6502/Myne/my6502.c
+
+CMakeFiles/myne.dir/Myne/my6502.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/myne.dir/Myne/my6502.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/ayeka/projects/Fake6502/Myne/my6502.c > CMakeFiles/myne.dir/Myne/my6502.c.i
+
+CMakeFiles/myne.dir/Myne/my6502.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/myne.dir/Myne/my6502.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/ayeka/projects/Fake6502/Myne/my6502.c -o CMakeFiles/myne.dir/Myne/my6502.c.s
+
 # Object files for target myne
 myne_OBJECTS = \
-"CMakeFiles/myne.dir/Myne/fake6502.c.o"
+"CMakeFiles/myne.dir/Myne/fake6502.c.o" \
+"CMakeFiles/myne.dir/Myne/my6502.c.o"
 
 # External object files for target myne
 myne_EXTERNAL_OBJECTS =
 
 libmyne.a: CMakeFiles/myne.dir/Myne/fake6502.c.o
+libmyne.a: CMakeFiles/myne.dir/Myne/my6502.c.o
 libmyne.a: CMakeFiles/myne.dir/build.make
 libmyne.a: CMakeFiles/myne.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayeka/projects/Fake6502/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C static library libmyne.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ayeka/projects/Fake6502/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C static library libmyne.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/myne.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/myne.dir/link.txt --verbose=$(VERBOSE)
 

@@ -1,2 +1,2 @@
-/usr/bin/ar qc libmyne.a CMakeFiles/myne.dir/Myne/fake6502.c.o
+/usr/bin/ar qc libmyne.a CMakeFiles/myne.dir/Myne/fake6502.c.o CMakeFiles/myne.dir/Myne/my6502.c.o
 /usr/bin/ranlib libmyne.a

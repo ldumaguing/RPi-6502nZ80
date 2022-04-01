@@ -124,229 +124,231 @@
     }
 
 typedef struct {
-    void (*addr_mode)(context_t *c);
-    void (*opcode)(context_t *c);
+    void ( *addr_mode ) ( context_t *c );
+    void ( *opcode ) ( context_t *c );
     int clockticks;
 } opcode_t;
 static opcode_t opcodes[256];
 
 // a few general functions used by various other functions
-void push6502_8(context_t *c, uint8_t pushval) {
-    mem_write(c, BASE_STACK + c->s--, pushval);
+void push6502_8 ( context_t *c, uint8_t pushval ) {
+    mem_write ( c, BASE_STACK + c->s--, pushval );
 }
 
-void push6502_16(context_t *c, uint16_t pushval) {
-    push6502_8(c, (pushval >> 8) & 0xFF);
-    push6502_8(c, pushval & 0xFF);
+void push6502_16 ( context_t *c, uint16_t pushval ) {
+    push6502_8 ( c, ( pushval >> 8 ) & 0xFF );
+    push6502_8 ( c, pushval & 0xFF );
 }
 
-uint8_t pull6502_8(context_t *c) { return (mem_read(c, BASE_STACK + ++c->s)); }
+uint8_t pull6502_8 ( context_t *c ) {
+    return ( mem_read ( c, BASE_STACK + ++c->s ) );
+}
 
-uint16_t pull6502_16(context_t *c) {
+uint16_t pull6502_16 ( context_t *c ) {
     uint8_t t;
-    t = pull6502_8(c);
-    return pull6502_8(c) << 8 | t;
+    t = pull6502_8 ( c );
+    return pull6502_8 ( c ) << 8 | t;
 }
 
-uint16_t mem_read16(context_t *c, uint16_t addr) {
+uint16_t mem_read16 ( context_t *c, uint16_t addr ) {
     // Read two consecutive bytes from memory
-    return ((uint16_t)mem_read(c, addr) |
-            ((uint16_t)mem_read(c, addr + 1) << 8));
+    return ( ( uint16_t ) mem_read ( c, addr ) |
+             ( ( uint16_t ) mem_read ( c, addr + 1 ) << 8 ) );
 }
 
-void reset6502(context_t *c) {
+void reset6502 ( context_t *c ) {
     // The 6502 normally does some fake reads after reset because
     // reset is a hacked-up version of NMI/IRQ/BRK
     // See https://www.pagetable.com/?p=410
-    mem_read(c, 0x00ff);
-    mem_read(c, 0x00ff);
-    mem_read(c, 0x00ff);
-    mem_read(c, 0x0100);
-    mem_read(c, 0x01ff);
-    mem_read(c, 0x01fe);
-    c->pc = mem_read16(c, 0xfffc);
+    mem_read ( c, 0x00ff );
+    mem_read ( c, 0x00ff );
+    mem_read ( c, 0x00ff );
+    mem_read ( c, 0x0100 );
+    mem_read ( c, 0x01ff );
+    mem_read ( c, 0x01fe );
+    c->pc = mem_read16 ( c, 0xfffc );
     c->s = 0xfd;
     c->flags |= FLAG_CONSTANT | FLAG_INTERRUPT;
 }
 
 // addressing mode functions, calculates effective addresses
-static void imp(context_t *c) { // implied
+static void imp ( context_t *c ) { // implied
 }
 
-static void acc(context_t *c) { // accumulator
+static void acc ( context_t *c ) { // accumulator
 }
 
-static void imm(context_t *c) { // immediate
+static void imm ( context_t *c ) { // immediate
     c->ea = c->pc++;
 }
 
-static void zp(context_t *c) { // zero-page
-    c->ea = (uint16_t)mem_read(c, (uint16_t)c->pc++);
+static void zp ( context_t *c ) { // zero-page
+    c->ea = ( uint16_t ) mem_read ( c, ( uint16_t ) c->pc++ );
 }
 
-static void zpx(context_t *c) { // zero-page,X
-    c->ea = ((uint16_t)mem_read(c, (uint16_t)c->pc++) + (uint16_t)c->x) &
+static void zpx ( context_t *c ) { // zero-page,X
+    c->ea = ( ( uint16_t ) mem_read ( c, ( uint16_t ) c->pc++ ) + ( uint16_t ) c->x ) &
             0xFF; // zero-page wraparound
 }
 
-static void zpy(context_t *c) { // zero-page,Y
-    c->ea = ((uint16_t)mem_read(c, (uint16_t)c->pc++) + (uint16_t)c->y) &
+static void zpy ( context_t *c ) { // zero-page,Y
+    c->ea = ( ( uint16_t ) mem_read ( c, ( uint16_t ) c->pc++ ) + ( uint16_t ) c->y ) &
             0xFF; // zero-page wraparound
 }
 
-static void rel(context_t *c) { // relative for branch ops (8-bit immediate
-                                // value, sign-extended)
-    uint16_t rel = (uint16_t)mem_read(c, c->pc++);
-    if (rel & 0x80)
+static void rel ( context_t *c ) { // relative for branch ops (8-bit immediate
+    // value, sign-extended)
+    uint16_t rel = ( uint16_t ) mem_read ( c, c->pc++ );
+    if ( rel & 0x80 )
         rel |= 0xFF00;
     c->ea = c->pc + rel;
 }
 
-static void abso(context_t *c) { // absolute
-    c->ea = mem_read16(c, c->pc);
+static void abso ( context_t *c ) { // absolute
+    c->ea = mem_read16 ( c, c->pc );
     c->pc += 2;
 }
 
-static void absx(context_t *c) { // absolute,X
-    c->ea = mem_read16(c, c->pc);
-    c->ea += (uint16_t)c->x;
+static void absx ( context_t *c ) { // absolute,X
+    c->ea = mem_read16 ( c, c->pc );
+    c->ea += ( uint16_t ) c->x;
 
     c->pc += 2;
 }
 
-static void absx_p(context_t *c) { // absolute,X with cycle penalty
+static void absx_p ( context_t *c ) { // absolute,X with cycle penalty
     uint16_t startpage;
-    c->ea = mem_read16(c, c->pc);
+    c->ea = mem_read16 ( c, c->pc );
     startpage = c->ea & 0xFF00;
-    c->ea += (uint16_t)c->x;
-    if (startpage != (c->ea & 0xff00))
+    c->ea += ( uint16_t ) c->x;
+    if ( startpage != ( c->ea & 0xff00 ) )
         c->clockticks++;
 
     c->pc += 2;
 }
 
-static void absxi(context_t *c) { // (absolute,X)
-    c->ea = mem_read16(c, c->pc);
-    c->ea += (uint16_t)c->x;
-    c->ea = mem_read16(c, c->ea);
+static void absxi ( context_t *c ) { // (absolute,X)
+    c->ea = mem_read16 ( c, c->pc );
+    c->ea += ( uint16_t ) c->x;
+    c->ea = mem_read16 ( c, c->ea );
 
     c->pc += 2;
 }
 
-static void absy(context_t *c) { // absolute,Y
-    c->ea = mem_read16(c, c->pc);
-    c->ea += (uint16_t)c->y;
+static void absy ( context_t *c ) { // absolute,Y
+    c->ea = mem_read16 ( c, c->pc );
+    c->ea += ( uint16_t ) c->y;
 
     c->pc += 2;
 }
 
-static void absy_p(context_t *c) { // absolute,Y
+static void absy_p ( context_t *c ) { // absolute,Y
     uint16_t startpage;
-    c->ea = mem_read16(c, c->pc);
+    c->ea = mem_read16 ( c, c->pc );
     startpage = c->ea & 0xFF00;
-    c->ea += (uint16_t)c->y;
-    if (startpage != (c->ea & 0xff00))
+    c->ea += ( uint16_t ) c->y;
+    if ( startpage != ( c->ea & 0xff00 ) )
         c->clockticks++;
 
     c->pc += 2;
 }
 
 #ifdef NMOS6502
-static void ind(context_t *c) { // indirect
+static void ind ( context_t *c ) { // indirect
     uint16_t eahelp, eahelp2;
-    eahelp = mem_read16(c, c->pc);
+    eahelp = mem_read16 ( c, c->pc );
     eahelp2 =
-        (eahelp & 0xFF00) |
-        ((eahelp + 1) & 0x00FF); // replicate 6502 page-boundary wraparound bug
+        ( eahelp & 0xFF00 ) |
+        ( ( eahelp + 1 ) & 0x00FF ); // replicate 6502 page-boundary wraparound bug
     c->ea =
-        (uint16_t)mem_read(c, eahelp) | ((uint16_t)mem_read(c, eahelp2) << 8);
+        ( uint16_t ) mem_read ( c, eahelp ) | ( ( uint16_t ) mem_read ( c, eahelp2 ) << 8 );
     c->pc += 2;
 }
 #endif
 
 #ifdef CMOS6502
-static void ind(context_t *c) { // indirect
+static void ind ( context_t *c ) { // indirect
     uint16_t eahelp;
-    eahelp = mem_read16(c, c->pc);
-    if ((eahelp & 0x00ff) == 0xff)
+    eahelp = mem_read16 ( c, c->pc );
+    if ( ( eahelp & 0x00ff ) == 0xff )
         c->clockticks++;
-    c->ea = mem_read16(c, eahelp);
+    c->ea = mem_read16 ( c, eahelp );
     c->pc += 2;
 }
 #endif
 
-static void indx(context_t *c) { // (indirect,X)
+static void indx ( context_t *c ) { // (indirect,X)
     uint16_t eahelp;
-    eahelp = (uint16_t)(((uint16_t)mem_read(c, c->pc++) + (uint16_t)c->x) &
-                        0xFF); // zero-page wraparound for table pointer
-    c->ea = (uint16_t)mem_read(c, eahelp & 0x00FF) |
-            ((uint16_t)mem_read(c, (eahelp + 1) & 0x00FF) << 8);
+    eahelp = ( uint16_t ) ( ( ( uint16_t ) mem_read ( c, c->pc++ ) + ( uint16_t ) c->x ) &
+                            0xFF ); // zero-page wraparound for table pointer
+    c->ea = ( uint16_t ) mem_read ( c, eahelp & 0x00FF ) |
+            ( ( uint16_t ) mem_read ( c, ( eahelp + 1 ) & 0x00FF ) << 8 );
 }
 
-static void indy(context_t *c) { // (indirect),Y
+static void indy ( context_t *c ) { // (indirect),Y
     uint16_t eahelp, eahelp2;
-    eahelp = (uint16_t)mem_read(c, c->pc++);
+    eahelp = ( uint16_t ) mem_read ( c, c->pc++ );
     eahelp2 =
-        (eahelp & 0xFF00) | ((eahelp + 1) & 0x00FF); // zero-page wraparound
+        ( eahelp & 0xFF00 ) | ( ( eahelp + 1 ) & 0x00FF ); // zero-page wraparound
     c->ea =
-        (uint16_t)mem_read(c, eahelp) | ((uint16_t)mem_read(c, eahelp2) << 8);
-    c->ea += (uint16_t)c->y;
+        ( uint16_t ) mem_read ( c, eahelp ) | ( ( uint16_t ) mem_read ( c, eahelp2 ) << 8 );
+    c->ea += ( uint16_t ) c->y;
 }
 
-static void indy_p(context_t *c) { // (indirect),Y
+static void indy_p ( context_t *c ) { // (indirect),Y
     uint16_t eahelp, eahelp2, startpage;
-    eahelp = (uint16_t)mem_read(c, c->pc++);
+    eahelp = ( uint16_t ) mem_read ( c, c->pc++ );
     eahelp2 =
-        (eahelp & 0xFF00) | ((eahelp + 1) & 0x00FF); // zero-page wraparound
+        ( eahelp & 0xFF00 ) | ( ( eahelp + 1 ) & 0x00FF ); // zero-page wraparound
     c->ea =
-        (uint16_t)mem_read(c, eahelp) | ((uint16_t)mem_read(c, eahelp2) << 8);
+        ( uint16_t ) mem_read ( c, eahelp ) | ( ( uint16_t ) mem_read ( c, eahelp2 ) << 8 );
     startpage = c->ea & 0xFF00;
-    c->ea += (uint16_t)c->y;
-    if (startpage != (c->ea & 0xff00))
+    c->ea += ( uint16_t ) c->y;
+    if ( startpage != ( c->ea & 0xff00 ) )
         c->clockticks++;
 }
 
-static void zpi(context_t *c) { // (zp)
+static void zpi ( context_t *c ) { // (zp)
     uint16_t eahelp, eahelp2;
-    eahelp = (uint16_t)mem_read(c, c->pc++);
+    eahelp = ( uint16_t ) mem_read ( c, c->pc++ );
     eahelp2 =
-        (eahelp & 0xFF00) | ((eahelp + 1) & 0x00FF); // zero-page wraparound
+        ( eahelp & 0xFF00 ) | ( ( eahelp + 1 ) & 0x00FF ); // zero-page wraparound
     c->ea =
-        (uint16_t)mem_read(c, eahelp) | ((uint16_t)mem_read(c, eahelp2) << 8);
+        ( uint16_t ) mem_read ( c, eahelp ) | ( ( uint16_t ) mem_read ( c, eahelp2 ) << 8 );
 }
 
-static uint16_t getvalue(context_t *c) {
-    if (opcodes[c->opcode].addr_mode == acc)
-        return ((uint16_t)c->a);
+static uint16_t getvalue ( context_t *c ) {
+    if ( opcodes[c->opcode].addr_mode == acc )
+        return ( ( uint16_t ) c->a );
     else
-        return ((uint16_t)mem_read(c, c->ea));
+        return ( ( uint16_t ) mem_read ( c, c->ea ) );
 }
 
-static void putvalue(context_t *c, uint16_t saveval) {
-    if (opcodes[c->opcode].addr_mode == acc)
-        c->a = (uint8_t)(saveval & 0x00FF);
+static void putvalue ( context_t *c, uint16_t saveval ) {
+    if ( opcodes[c->opcode].addr_mode == acc )
+        c->a = ( uint8_t ) ( saveval & 0x00FF );
     else
-        mem_write(c, c->ea, (saveval & 0x00FF));
+        mem_write ( c, c->ea, ( saveval & 0x00FF ) );
 }
 
-uint8_t add8(context_t *c, uint16_t a, uint16_t b, bool carry) {
-    uint16_t result = a + b + (uint16_t)(carry ? 1 : 0);
+uint8_t add8 ( context_t *c, uint16_t a, uint16_t b, bool carry ) {
+    uint16_t result = a + b + ( uint16_t ) ( carry ? 1 : 0 );
 
-    carrycalc(c, result);
-    zerocalc(c, result);
-    overflowcalc(c, result, a, b);
-    signcalc(c, result);
+    carrycalc ( c, result );
+    zerocalc ( c, result );
+    overflowcalc ( c, result, a, b );
+    signcalc ( c, result );
 
 #ifdef DECIMALMODE
-    if (c->flags & FLAG_DECIMAL) {
-        clearcarry(c);
+    if ( c->flags & FLAG_DECIMAL ) {
+        clearcarry ( c );
 
-        if ((result & 0x0F) > 0x09) {
+        if ( ( result & 0x0F ) > 0x09 ) {
             result += 0x06;
         }
-        if ((result & 0xF0) > 0x90) {
+        if ( ( result & 0xF0 ) > 0x90 ) {
             result += 0x60;
-            setcarry(c);
+            setcarry ( c );
         }
 
         c->clockticks++;
@@ -355,447 +357,511 @@ uint8_t add8(context_t *c, uint16_t a, uint16_t b, bool carry) {
     return result;
 }
 
-uint8_t rotate_right(context_t *c, uint16_t value) {
-    uint16_t result = (value >> 1) | ((c->flags & FLAG_CARRY) << 7);
+uint8_t rotate_right ( context_t *c, uint16_t value ) {
+    uint16_t result = ( value >> 1 ) | ( ( c->flags & FLAG_CARRY ) << 7 );
 
-    if (value & 1)
-        setcarry(c);
+    if ( value & 1 )
+        setcarry ( c );
     else
-        clearcarry(c);
-    zerocalc(c, result);
-    signcalc(c, result);
+        clearcarry ( c );
+    zerocalc ( c, result );
+    signcalc ( c, result );
 
     return result;
 }
 
-uint8_t rotate_left(context_t *c, uint16_t value) {
-    uint16_t result = (value << 1) | (c->flags & FLAG_CARRY);
+uint8_t rotate_left ( context_t *c, uint16_t value ) {
+    uint16_t result = ( value << 1 ) | ( c->flags & FLAG_CARRY );
 
-    carrycalc(c, result);
-    zerocalc(c, result);
-    signcalc(c, result);
+    carrycalc ( c, result );
+    zerocalc ( c, result );
+    signcalc ( c, result );
 
     return result;
 }
 
-uint8_t logical_shift_right(context_t *c, uint8_t value) {
+uint8_t logical_shift_right ( context_t *c, uint8_t value ) {
     uint16_t result = value >> 1;
-    if (value & 1)
-        setcarry(c);
+    if ( value & 1 )
+        setcarry ( c );
     else
-        clearcarry(c);
-    zerocalc(c, result);
-    signcalc(c, result);
+        clearcarry ( c );
+    zerocalc ( c, result );
+    signcalc ( c, result );
 
     return result;
 }
 
-uint8_t arithmetic_shift_left(context_t *c, uint8_t value) {
+uint8_t arithmetic_shift_left ( context_t *c, uint8_t value ) {
     uint16_t result = value << 1;
 
-    carrycalc(c, result);
-    zerocalc(c, result);
-    signcalc(c, result);
+    carrycalc ( c, result );
+    zerocalc ( c, result );
+    signcalc ( c, result );
     return result;
 }
 
-uint8_t exclusive_or(context_t *c, uint8_t a, uint8_t b) {
+uint8_t exclusive_or ( context_t *c, uint8_t a, uint8_t b ) {
     uint16_t result = a ^ b;
 
-    zerocalc(c, result);
-    signcalc(c, result);
+    zerocalc ( c, result );
+    signcalc ( c, result );
 
     return result;
 }
 
-uint8_t boolean_and(context_t *c, uint8_t a, uint8_t b) {
-    uint16_t result = (uint16_t)a & b;
+uint8_t boolean_and ( context_t *c, uint8_t a, uint8_t b ) {
+    uint16_t result = ( uint16_t ) a & b;
 
-    zerocalc(c, result);
-    signcalc(c, result);
+    zerocalc ( c, result );
+    signcalc ( c, result );
     return result;
 }
 
 // instruction handler functions
-void adc(context_t *c) {
-    uint16_t value = getvalue(c);
-    saveaccum(c, add8(c, c->a, value, c->flags & FLAG_CARRY));
+void adc ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    saveaccum ( c, add8 ( c, c->a, value, c->flags & FLAG_CARRY ) );
 }
 
-void and (context_t * c) {
-    uint8_t m = getvalue(c);
-    saveaccum(c, boolean_and(c, c->a, m));
+void and ( context_t * c ) {
+    uint8_t m = getvalue ( c );
+    saveaccum ( c, boolean_and ( c, c->a, m ) );
 }
 
-void asl(context_t *c) { putvalue(c, arithmetic_shift_left(c, getvalue(c))); }
+void asl ( context_t *c ) {
+    putvalue ( c, arithmetic_shift_left ( c, getvalue ( c ) ) );
+}
 
-void bra(context_t *c) {
+void bra ( context_t *c ) {
     uint16_t oldpc = c->pc;
     c->pc = c->ea;
-    if ((oldpc & 0xFF00) != (c->pc & 0xFF00))
+    if ( ( oldpc & 0xFF00 ) != ( c->pc & 0xFF00 ) )
         c->clockticks += 2; // check if jump crossed a page boundary
     else
         c->clockticks++;
 }
 
-void bcc(context_t *c) {
-    if ((c->flags & FLAG_CARRY) == 0)
-        bra(c);
+void bcc ( context_t *c ) {
+    if ( ( c->flags & FLAG_CARRY ) == 0 )
+        bra ( c );
 }
 
-void bcs(context_t *c) {
-    if ((c->flags & FLAG_CARRY) == FLAG_CARRY)
-        bra(c);
+void bcs ( context_t *c ) {
+    if ( ( c->flags & FLAG_CARRY ) == FLAG_CARRY )
+        bra ( c );
 }
 
-void beq(context_t *c) {
-    if ((c->flags & FLAG_ZERO) == FLAG_ZERO)
-        bra(c);
+void beq ( context_t *c ) {
+    if ( ( c->flags & FLAG_ZERO ) == FLAG_ZERO )
+        bra ( c );
 }
 
-void bit(context_t *c) {
-    uint8_t value = getvalue(c);
-    uint8_t result = (uint16_t)c->a & value;
+void bit ( context_t *c ) {
+    uint8_t value = getvalue ( c );
+    uint8_t result = ( uint16_t ) c->a & value;
 
-    zerocalc(c, result);
-    c->flags = (c->flags & 0x3F) | (uint8_t)(value & 0xC0);
+    zerocalc ( c, result );
+    c->flags = ( c->flags & 0x3F ) | ( uint8_t ) ( value & 0xC0 );
 }
 
-void bit_imm(context_t *c) {
-    uint8_t value = getvalue(c);
-    uint8_t result = (uint16_t)c->a & value;
+void bit_imm ( context_t *c ) {
+    uint8_t value = getvalue ( c );
+    uint8_t result = ( uint16_t ) c->a & value;
 
-    zerocalc(c, result);
+    zerocalc ( c, result );
 }
 
-void bmi(context_t *c) {
-    if ((c->flags & FLAG_SIGN) == FLAG_SIGN)
-        bra(c);
+void bmi ( context_t *c ) {
+    if ( ( c->flags & FLAG_SIGN ) == FLAG_SIGN )
+        bra ( c );
 }
 
-void bne(context_t *c) {
-    if ((c->flags & FLAG_ZERO) == 0)
-        bra(c);
+void bne ( context_t *c ) {
+    if ( ( c->flags & FLAG_ZERO ) == 0 )
+        bra ( c );
 }
 
-void bpl(context_t *c) {
-    if ((c->flags & FLAG_SIGN) == 0)
-        bra(c);
+void bpl ( context_t *c ) {
+    if ( ( c->flags & FLAG_SIGN ) == 0 )
+        bra ( c );
 }
 
-void brk(context_t *c) {
+void brk ( context_t *c ) {
     c->pc++;
-    push6502_16(c, c->pc);                // push next instruction address onto stack
-    push6502_8(c, c->flags | FLAG_BREAK); // push CPU flags to stack
-    setinterrupt(c);                 // set interrupt flag
-    c->pc = mem_read16(c, 0xfffe);
+    push6502_16 ( c, c->pc );             // push next instruction address onto stack
+    push6502_8 ( c, c->flags | FLAG_BREAK ); // push CPU flags to stack
+    setinterrupt ( c );              // set interrupt flag
+    c->pc = mem_read16 ( c, 0xfffe );
 }
 
-void bvc(context_t *c) {
-    if ((c->flags & FLAG_OVERFLOW) == 0)
-        bra(c);
+void bvc ( context_t *c ) {
+    if ( ( c->flags & FLAG_OVERFLOW ) == 0 )
+        bra ( c );
 }
 
-void bvs(context_t *c) {
-    if ((c->flags & FLAG_OVERFLOW) == FLAG_OVERFLOW)
-        bra(c);
+void bvs ( context_t *c ) {
+    if ( ( c->flags & FLAG_OVERFLOW ) == FLAG_OVERFLOW )
+        bra ( c );
 }
 
-void clc(context_t *c) { clearcarry(c); }
+void clc ( context_t *c ) {
+    clearcarry ( c );
+}
 
-void cld(context_t *c) { cleardecimal(c); }
+void cld ( context_t *c ) {
+    cleardecimal ( c );
+}
 
-void cli(context_t *c) { clearinterrupt(c); }
+void cli ( context_t *c ) {
+    clearinterrupt ( c );
+}
 
-void clv(context_t *c) { clearoverflow(c); }
+void clv ( context_t *c ) {
+    clearoverflow ( c );
+}
 
-static void compare(context_t *c, uint16_t r) {
-    uint16_t value = getvalue(c);
+static void compare ( context_t *c, uint16_t r ) {
+    uint16_t value = getvalue ( c );
     uint16_t result = r - value;
 
-    if (r >= (uint8_t)(value & 0x00FF))
-        setcarry(c);
+    if ( r >= ( uint8_t ) ( value & 0x00FF ) )
+        setcarry ( c );
     else
-        clearcarry(c);
-    if (r == (uint8_t)(value & 0x00FF))
-        setzero(c);
+        clearcarry ( c );
+    if ( r == ( uint8_t ) ( value & 0x00FF ) )
+        setzero ( c );
     else
-        clearzero(c);
-    signcalc(c, result);
+        clearzero ( c );
+    signcalc ( c, result );
 }
 
-void cmp(context_t *c) { compare(c, c->a); }
+void cmp ( context_t *c ) {
+    compare ( c, c->a );
+}
 
-void cpx(context_t *c) { compare(c, c->x); }
+void cpx ( context_t *c ) {
+    compare ( c, c->x );
+}
 
-void cpy(context_t *c) { compare(c, c->y); }
+void cpy ( context_t *c ) {
+    compare ( c, c->y );
+}
 
-uint8_t decrement(context_t *c, uint8_t r) {
+uint8_t decrement ( context_t *c, uint8_t r ) {
     uint16_t result = r - 1;
-    zerocalc(c, result);
-    signcalc(c, result);
+    zerocalc ( c, result );
+    signcalc ( c, result );
     return result;
 }
 
-void dec(context_t *c) { putvalue(c, decrement(c, getvalue(c))); }
+void dec ( context_t *c ) {
+    putvalue ( c, decrement ( c, getvalue ( c ) ) );
+}
 
-void dex(context_t *c) { c->x = decrement(c, c->x); }
+void dex ( context_t *c ) {
+    c->x = decrement ( c, c->x );
+}
 
-void dey(context_t *c) { c->y = decrement(c, c->y); }
+void dey ( context_t *c ) {
+    c->y = decrement ( c, c->y );
+}
 
-void eor(context_t *c) { saveaccum(c, exclusive_or(c, c->a, getvalue(c))); }
+void eor ( context_t *c ) {
+    saveaccum ( c, exclusive_or ( c, c->a, getvalue ( c ) ) );
+}
 
-uint8_t increment(context_t *c, uint8_t r) {
+uint8_t increment ( context_t *c, uint8_t r ) {
     uint16_t result = r + 1;
-    zerocalc(c, result);
-    signcalc(c, result);
+    zerocalc ( c, result );
+    signcalc ( c, result );
     return result;
 }
 
-void inc(context_t *c) { putvalue(c, increment(c, getvalue(c))); }
+void inc ( context_t *c ) {
+    putvalue ( c, increment ( c, getvalue ( c ) ) );
+}
 
-void inx(context_t *c) { c->x = increment(c, c->x); }
+void inx ( context_t *c ) {
+    c->x = increment ( c, c->x );
+}
 
-void iny(context_t *c) { c->y = increment(c, c->y); }
+void iny ( context_t *c ) {
+    c->y = increment ( c, c->y );
+}
 
-void jmp(context_t *c) { c->pc = c->ea; }
-
-void jsr(context_t *c) {
-    push6502_16(c, c->pc - 1);
+void jmp ( context_t *c ) {
     c->pc = c->ea;
 }
 
-void lda(context_t *c) {
-    uint16_t value = getvalue(c);
-    c->a = (uint8_t)(value & 0x00FF);
-
-    zerocalc(c, c->a);
-    signcalc(c, c->a);
+void jsr ( context_t *c ) {
+    push6502_16 ( c, c->pc - 1 );
+    c->pc = c->ea;
 }
 
-void ldx(context_t *c) {
-    uint16_t value = getvalue(c);
-    c->x = (uint8_t)(value & 0x00FF);
+void lda ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    c->a = ( uint8_t ) ( value & 0x00FF );
 
-    zerocalc(c, c->x);
-    signcalc(c, c->x);
+    zerocalc ( c, c->a );
+    signcalc ( c, c->a );
 }
 
-void ldy(context_t *c) {
-    uint16_t value = getvalue(c);
-    c->y = (uint8_t)(value & 0x00FF);
+void ldx ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    c->x = ( uint8_t ) ( value & 0x00FF );
 
-    zerocalc(c, c->y);
-    signcalc(c, c->y);
+    zerocalc ( c, c->x );
+    signcalc ( c, c->x );
 }
 
-void lsr(context_t *c) { putvalue(c, logical_shift_right(c, getvalue(c))); }
+void ldy ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    c->y = ( uint8_t ) ( value & 0x00FF );
 
-void nop(context_t *c) {}
-
-void ora(context_t *c) {
-    uint16_t value = getvalue(c);
-    uint16_t result = (uint16_t)c->a | value;
-
-    zerocalc(c, result);
-    signcalc(c, result);
-
-    saveaccum(c, result);
+    zerocalc ( c, c->y );
+    signcalc ( c, c->y );
 }
 
-void pha(context_t *c) { push6502_8(c, c->a); }
-
-void phx(context_t *c) { push6502_8(c, c->x); }
-
-void phy(context_t *c) { push6502_8(c, c->y); }
-
-void php(context_t *c) { push6502_8(c, c->flags | FLAG_BREAK); }
-
-void pla(context_t *c) {
-    c->a = pull6502_8(c);
-
-    zerocalc(c, c->a);
-    signcalc(c, c->a);
+void lsr ( context_t *c ) {
+    putvalue ( c, logical_shift_right ( c, getvalue ( c ) ) );
 }
 
-void plx(context_t *c) {
-    c->x = pull6502_8(c);
+void nop ( context_t *c ) {}
 
-    zerocalc(c, c->x);
-    signcalc(c, c->x);
+void ora ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    uint16_t result = ( uint16_t ) c->a | value;
+
+    zerocalc ( c, result );
+    signcalc ( c, result );
+
+    saveaccum ( c, result );
 }
 
-void ply(context_t *c) {
-    c->y = pull6502_8(c);
-
-    zerocalc(c, c->y);
-    signcalc(c, c->y);
+void pha ( context_t *c ) {
+    push6502_8 ( c, c->a );
 }
 
-void plp(context_t *c) { c->flags = pull6502_8(c) | FLAG_CONSTANT | FLAG_BREAK; }
-
-void rol(context_t *c) {
-    uint16_t value = getvalue(c);
-
-    putvalue(c, value);
-    putvalue(c, rotate_left(c, value));
+void phx ( context_t *c ) {
+    push6502_8 ( c, c->x );
 }
 
-void ror(context_t *c) {
-    uint16_t value = getvalue(c);
-
-    putvalue(c, value);
-    putvalue(c, rotate_right(c, value));
+void phy ( context_t *c ) {
+    push6502_8 ( c, c->y );
 }
 
-void rti(context_t *c) {
-    c->flags = pull6502_8(c) | FLAG_CONSTANT | FLAG_BREAK;
-    c->pc = pull6502_16(c);
+void php ( context_t *c ) {
+    push6502_8 ( c, c->flags | FLAG_BREAK );
 }
 
-void rts(context_t *c) { c->pc = pull6502_16(c) + 1; }
+void pla ( context_t *c ) {
+    c->a = pull6502_8 ( c );
 
-void sbc(context_t *c) {
-    uint16_t value = getvalue(c);
+    zerocalc ( c, c->a );
+    signcalc ( c, c->a );
+}
+
+void plx ( context_t *c ) {
+    c->x = pull6502_8 ( c );
+
+    zerocalc ( c, c->x );
+    signcalc ( c, c->x );
+}
+
+void ply ( context_t *c ) {
+    c->y = pull6502_8 ( c );
+
+    zerocalc ( c, c->y );
+    signcalc ( c, c->y );
+}
+
+void plp ( context_t *c ) {
+    c->flags = pull6502_8 ( c ) | FLAG_CONSTANT | FLAG_BREAK;
+}
+
+void rol ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+
+    putvalue ( c, value );
+    putvalue ( c, rotate_left ( c, value ) );
+}
+
+void ror ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+
+    putvalue ( c, value );
+    putvalue ( c, rotate_right ( c, value ) );
+}
+
+void rti ( context_t *c ) {
+    c->flags = pull6502_8 ( c ) | FLAG_CONSTANT | FLAG_BREAK;
+    c->pc = pull6502_16 ( c );
+}
+
+void rts ( context_t *c ) {
+    c->pc = pull6502_16 ( c ) + 1;
+}
+
+void sbc ( context_t *c ) {
+    uint16_t value = getvalue ( c );
     uint16_t result =
-        (uint16_t)c->a - value - ((c->flags & FLAG_CARRY) ? 0 : 1);
+        ( uint16_t ) c->a - value - ( ( c->flags & FLAG_CARRY ) ? 0 : 1 );
 
-    carrycalc(c, result);
-    zerocalc(c, result);
-    overflowcalc(c, result, c->a, value);
-    signcalc(c, result);
+    carrycalc ( c, result );
+    zerocalc ( c, result );
+    overflowcalc ( c, result, c->a, value );
+    signcalc ( c, result );
 
 #ifndef NES_CPU
-    if (c->flags & FLAG_DECIMAL) {
-        clearcarry(c);
+    if ( c->flags & FLAG_DECIMAL ) {
+        clearcarry ( c );
 
-        if ((result & 0x0F) > 0x09) {
+        if ( ( result & 0x0F ) > 0x09 ) {
             result -= 0x06;
         }
-        if ((result & 0xF0) > 0x90) {
+        if ( ( result & 0xF0 ) > 0x90 ) {
             result -= 0x60;
-            setcarry(c);
+            setcarry ( c );
         }
 
         c->clockticks++;
     }
 #endif
 
-    saveaccum(c, result);
+    saveaccum ( c, result );
 }
 
-void sec(context_t *c) { setcarry(c); }
+void sec ( context_t *c ) {
+    setcarry ( c );
+}
 
-void sed(context_t *c) { setdecimal(c); }
+void sed ( context_t *c ) {
+    setdecimal ( c );
+}
 
-void sei(context_t *c) { setinterrupt(c); }
+void sei ( context_t *c ) {
+    setinterrupt ( c );
+}
 
-void sta(context_t *c) { putvalue(c, c->a); }
+void sta ( context_t *c ) {
+    putvalue ( c, c->a );
+}
 
-void stx(context_t *c) { putvalue(c, c->x); }
+void stx ( context_t *c ) {
+    putvalue ( c, c->x );
+}
 
-void sty(context_t *c) { putvalue(c, c->y); }
+void sty ( context_t *c ) {
+    putvalue ( c, c->y );
+}
 
-void stz(context_t *c) { putvalue(c, 0); }
+void stz ( context_t *c ) {
+    putvalue ( c, 0 );
+}
 
-void tax(context_t *c) {
+void tax ( context_t *c ) {
     c->x = c->a;
 
-    zerocalc(c, c->x);
-    signcalc(c, c->x);
+    zerocalc ( c, c->x );
+    signcalc ( c, c->x );
 }
 
-void tay(context_t *c) {
+void tay ( context_t *c ) {
     c->y = c->a;
 
-    zerocalc(c, c->y);
-    signcalc(c, c->y);
+    zerocalc ( c, c->y );
+    signcalc ( c, c->y );
 }
 
-void tsx(context_t *c) {
+void tsx ( context_t *c ) {
     c->x = c->s;
 
-    zerocalc(c, c->x);
-    signcalc(c, c->x);
+    zerocalc ( c, c->x );
+    signcalc ( c, c->x );
 }
 
-void trb(context_t *c) {
-    uint16_t value = getvalue(c);
-    uint16_t result = (uint16_t)c->a & ~value;
-    putvalue(c, result);
-    zerocalc(c, (c->a | result) & 0x00ff);
+void trb ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    uint16_t result = ( uint16_t ) c->a & ~value;
+    putvalue ( c, result );
+    zerocalc ( c, ( c->a | result ) & 0x00ff );
 }
 
-void tsb(context_t *c) {
-    uint16_t value = getvalue(c);
-    uint16_t result = (uint16_t)c->a | value;
-    putvalue(c, result);
-    zerocalc(c, (c->a | result) & 0x00ff);
+void tsb ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    uint16_t result = ( uint16_t ) c->a | value;
+    putvalue ( c, result );
+    zerocalc ( c, ( c->a | result ) & 0x00ff );
 }
 
-void txa(context_t *c) {
+void txa ( context_t *c ) {
     c->a = c->x;
 
-    zerocalc(c, c->a);
-    signcalc(c, c->a);
+    zerocalc ( c, c->a );
+    signcalc ( c, c->a );
 }
 
-void txs(context_t *c) { c->s = c->x; }
+void txs ( context_t *c ) {
+    c->s = c->x;
+}
 
-void tya(context_t *c) {
+void tya ( context_t *c ) {
     c->a = c->y;
 
-    zerocalc(c, c->a);
-    signcalc(c, c->a);
+    zerocalc ( c, c->a );
+    signcalc ( c, c->a );
 }
 
-void lax(context_t *c) {
-    uint16_t value = getvalue(c);
-    c->x = c->a = (uint8_t)(value & 0x00FF);
+void lax ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    c->x = c->a = ( uint8_t ) ( value & 0x00FF );
 
-    zerocalc(c, c->a);
-    signcalc(c, c->a);
+    zerocalc ( c, c->a );
+    signcalc ( c, c->a );
 }
 
-void sax(context_t *c) { putvalue(c, c->a & c->x); }
-
-void dcp(context_t *c) {
-    dec(c);
-    cmp(c);
+void sax ( context_t *c ) {
+    putvalue ( c, c->a & c->x );
 }
 
-void isb(context_t *c) {
-    inc(c);
-    sbc(c);
+void dcp ( context_t *c ) {
+    dec ( c );
+    cmp ( c );
 }
 
-void slo(context_t *c) {
-    asl(c);
-    ora(c);
+void isb ( context_t *c ) {
+    inc ( c );
+    sbc ( c );
 }
 
-void rla(context_t *c) {
-    uint16_t value = getvalue(c);
-    uint16_t result = rotate_left(c, value);
-    putvalue(c, value);
-    putvalue(c, result);
-    saveaccum(c, boolean_and(c, c->a, result));
+void slo ( context_t *c ) {
+    asl ( c );
+    ora ( c );
 }
 
-void sre(context_t *c) {
-    uint16_t value = getvalue(c);
-    uint16_t result = logical_shift_right(c, value);
-    putvalue(c, value);
-    putvalue(c, result);
-    saveaccum(c, exclusive_or(c, c->a, result));
+void rla ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    uint16_t result = rotate_left ( c, value );
+    putvalue ( c, value );
+    putvalue ( c, result );
+    saveaccum ( c, boolean_and ( c, c->a, result ) );
 }
 
-void rra(context_t *c) {
-    uint16_t value = getvalue(c);
-    uint16_t result = rotate_right(c, value);
-    putvalue(c, value);
-    putvalue(c, result);
-    saveaccum(c, add8(c, c->a, result, c->flags & FLAG_CARRY));
+void sre ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    uint16_t result = logical_shift_right ( c, value );
+    putvalue ( c, value );
+    putvalue ( c, result );
+    saveaccum ( c, exclusive_or ( c, c->a, result ) );
+}
+
+void rra ( context_t *c ) {
+    uint16_t value = getvalue ( c );
+    uint16_t result = rotate_right ( c, value );
+    putvalue ( c, value );
+    putvalue ( c, result );
+    saveaccum ( c, add8 ( c, c->a, result, c->flags & FLAG_CARRY ) );
 }
 
 #ifdef NMOS6502
@@ -1071,7 +1137,8 @@ static opcode_t opcodes[256] = {
     {absx, nop, 4},
     {absx_p, sbc, 4},
     {absx, inc, 7},
-    {absx, isb, 7}};
+    {absx, isb, 7}
+};
 #endif
 
 #ifdef CMOS6502
@@ -1347,31 +1414,32 @@ static opcode_t opcodes[256] = {
     {absx, nop, 4},
     {absx_p, sbc, 4},
     {absx, inc, 7},
-    {absx, isb, 7}};
+    {absx, isb, 7}
+};
 #endif
 
-void nmi6502(context_t *c) {
-    push6502_16(c, c->pc);
-    push6502_8(c, c->flags & ~FLAG_BREAK);
+void nmi6502 ( context_t *c ) {
+    push6502_16 ( c, c->pc );
+    push6502_8 ( c, c->flags & ~FLAG_BREAK );
     c->flags |= FLAG_INTERRUPT;
-    c->pc = mem_read16(c, 0xfffa);
+    c->pc = mem_read16 ( c, 0xfffa );
 }
 
-void irq6502(context_t *c) {
-    if ((c->flags & FLAG_INTERRUPT) == 0) {
-        push6502_16(c, c->pc);
-        push6502_8(c, c->flags & ~FLAG_BREAK);
+void irq6502 ( context_t *c ) {
+    if ( ( c->flags & FLAG_INTERRUPT ) == 0 ) {
+        push6502_16 ( c, c->pc );
+        push6502_8 ( c, c->flags & ~FLAG_BREAK );
         c->flags |= FLAG_INTERRUPT;
-        c->pc = mem_read16(c, 0xfffe);
+        c->pc = mem_read16 ( c, 0xfffe );
     }
 }
 
-void step(context_t *c) {
-    uint8_t opcode = mem_read(c, c->pc++);
+void step ( context_t *c ) {
+    uint8_t opcode = mem_read ( c, c->pc++ );
     c->opcode = opcode;
     c->flags |= FLAG_CONSTANT;
 
-    opcodes[opcode].addr_mode(c);
-    opcodes[opcode].opcode(c);
+    opcodes[opcode].addr_mode ( c );
+    opcodes[opcode].opcode ( c );
     c->clockticks += opcodes[opcode].clockticks;
 }

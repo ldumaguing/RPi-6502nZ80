@@ -41,14 +41,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "fake6502::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-fake6502-Release-1ac1b55abafc44771d2d.json",
+					"jsonFile" : "target-fake6502-Release-2edaa5f8a2a6722b375d.json",
 					"name" : "fake6502",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "myne::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-myne-Release-844127ddb1d39b266300.json",
+					"jsonFile" : "target-myne-Release-71ec96713e43b35ae357.json",
 					"name" : "myne",
 					"projectIndex" : 0
 				}
