@@ -10,7 +10,7 @@ static void absi ( context_t *c ) { // (absolute)
 }
 
 static void rel_zp ( context_t *c ) {
-    abso ( c );
+    abso ( c );  // two bytes store rel & zp in ea
 }
 
 // **************************************************************************************
