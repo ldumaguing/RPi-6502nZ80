@@ -66,6 +66,10 @@ void loadROM()
     fp = fopen("rom.bin", "rb");
     fread(ROM, ROM_size, 1, fp);
     fclose(fp);
+    
+    ROM[0x3ffc] = 0x00;
+    ROM[0x3ffd] = 0xc0;
+    RAM[0x0012] = 1;
 }
 
 // **************************************************************************************
@@ -118,6 +122,12 @@ void CPU_Read()
         fish[0] = ROM[relROMaddr];
         if (write(fi2c, fish, 1) != 1)
             perror("Failed to write to PCF\n");
+    } else {
+        printf(".%02x,%x", RAM[Address], Address);
+        unsigned char fish[1];
+        fish[0] = RAM[Address];
+        if (write(fi2c, fish, 1) != 1)
+            perror("Failed to.write to PCF\n");
     }
 
 
