@@ -1165,11 +1165,12 @@ static void rel_zp ( context_t *c ) {
 void bbr0 ( context_t *c ) {
     uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
     uint16_t zp = c->ea & 0x00FF;
-
+printf("%x,%x\n", rel, zp);
     if ( rel & 0x80 ) rel |= 0xFF00;
     c->ea = c->pc + rel;
-
+printf(" %x\n",c->ea);
     if ( ( mem_read ( c, zp ) & 0x01 ) == 0 ) bra ( c );
+printf("  %x\n",mem_read ( c, zp ) & 0x01);
 }
 
 // **************************************************************************************
@@ -1190,7 +1191,7 @@ static opcode_t opcodes[256] = {
     {abso, tsb, 6},
     {abso, ora, 4},
     {abso, asl, 6},
-    {abso, slo, 6},
+    {rel_zp, bbr0, 5},  // *******
     /* 01 */
     {rel, bpl, 2},
     {indy_p, ora, 5},
