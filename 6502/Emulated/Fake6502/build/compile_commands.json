@@ -6,11 +6,6 @@
 },
 {
   "directory": "/home/ayeka/projects/Fake6502/build",
-  "command": "/usr/bin/cc   -O3 -DNDEBUG -o CMakeFiles/myne.dir/Myne/my6502.c.o -c /home/ayeka/projects/Fake6502/Myne/my6502.c",
-  "file": "/home/ayeka/projects/Fake6502/Myne/my6502.c"
-},
-{
-  "directory": "/home/ayeka/projects/Fake6502/build",
   "command": "/usr/bin/cc   -O3 -DNDEBUG -o CMakeFiles/fake6502.dir/main.c.o -c /home/ayeka/projects/Fake6502/main.c",
   "file": "/home/ayeka/projects/Fake6502/main.c"
 }

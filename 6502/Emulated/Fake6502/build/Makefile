@@ -228,33 +228,6 @@ Myne/fake6502.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/myne.dir/build.make CMakeFiles/myne.dir/Myne/fake6502.c.s
 .PHONY : Myne/fake6502.c.s
 
-Myne/my6502.o: Myne/my6502.c.o
-
-.PHONY : Myne/my6502.o
-
-# target to build an object file
-Myne/my6502.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/myne.dir/build.make CMakeFiles/myne.dir/Myne/my6502.c.o
-.PHONY : Myne/my6502.c.o
-
-Myne/my6502.i: Myne/my6502.c.i
-
-.PHONY : Myne/my6502.i
-
-# target to preprocess a source file
-Myne/my6502.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/myne.dir/build.make CMakeFiles/myne.dir/Myne/my6502.c.i
-.PHONY : Myne/my6502.c.i
-
-Myne/my6502.s: Myne/my6502.c.s
-
-.PHONY : Myne/my6502.s
-
-# target to generate assembly for a file
-Myne/my6502.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/myne.dir/build.make CMakeFiles/myne.dir/Myne/my6502.c.s
-.PHONY : Myne/my6502.c.s
-
 main.o: main.c.o
 
 .PHONY : main.o
@@ -299,9 +272,6 @@ help:
 	@echo "... Myne/fake6502.o"
 	@echo "... Myne/fake6502.i"
 	@echo "... Myne/fake6502.s"
-	@echo "... Myne/my6502.o"
-	@echo "... Myne/my6502.i"
-	@echo "... Myne/my6502.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

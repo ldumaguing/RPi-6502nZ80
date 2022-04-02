@@ -8,7 +8,6 @@ add_library(
    myne
    Myne/myne.h
    Myne/fake6502.c
-   Myne/my6502.c
 )
 
 target_link_libraries(fake6502

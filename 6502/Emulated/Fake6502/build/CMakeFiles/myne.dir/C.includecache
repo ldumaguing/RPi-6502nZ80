@@ -16,10 +16,6 @@ stdint.h
 stdio.h
 -
 
-/home/ayeka/projects/Fake6502/Myne/my6502.c
-fake6502.c
-/home/ayeka/projects/Fake6502/Myne/fake6502.c
-
 /home/ayeka/projects/Fake6502/Myne/myne.h
 stdint.h
 -

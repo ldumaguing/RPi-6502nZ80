@@ -1,6 +1,5 @@
 file(REMOVE_RECURSE
   "CMakeFiles/myne.dir/Myne/fake6502.c.o"
-  "CMakeFiles/myne.dir/Myne/my6502.c.o"
   "libmyne.a"
   "libmyne.pdb"
 )

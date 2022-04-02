@@ -5,7 +5,6 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
   "/home/ayeka/projects/Fake6502/Myne/fake6502.c" "/home/ayeka/projects/Fake6502/build/CMakeFiles/myne.dir/Myne/fake6502.c.o"
-  "/home/ayeka/projects/Fake6502/Myne/my6502.c" "/home/ayeka/projects/Fake6502/build/CMakeFiles/myne.dir/Myne/my6502.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

@@ -4,7 +4,3 @@
 CMakeFiles/myne.dir/Myne/fake6502.c.o: ../Myne/fake6502.c
 CMakeFiles/myne.dir/Myne/fake6502.c.o: ../Myne/myne.h
 
-CMakeFiles/myne.dir/Myne/my6502.c.o: ../Myne/fake6502.c
-CMakeFiles/myne.dir/Myne/my6502.c.o: ../Myne/my6502.c
-CMakeFiles/myne.dir/Myne/my6502.c.o: ../Myne/myne.h
-

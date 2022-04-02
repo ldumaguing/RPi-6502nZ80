@@ -1,0 +1,1 @@
+/home/ayeka/projects/Fake6502/bin/fake6502

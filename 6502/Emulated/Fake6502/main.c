@@ -15,36 +15,45 @@ uint8_t mem_read ( context_t *c, uint16_t addr ) {
 
 int main ( int argc, char *argv[] ) {
     context_t c;
+    /*
+    c.mem[0xc000] = 0xea;
+    c.mem[0xc001] = 0x4c;
+    c.mem[0xc002] = 0x00;
+    c.mem[0xc003] = 0xc0;
+    */
 
-    c.mem[0xc000] = 0xa9;
-    c.mem[0xc001] = 0xff;
-    c.mem[0xc002] = 0x8d;
-    c.mem[0xc003] = 0x02;
-    c.mem[0xc004] = 0x60;
-    c.mem[0xc005] = 0xa9;
-    c.mem[0xc006] = 0x55;
-    c.mem[0xc007] = 0x8d;
 
-    c.mem[0xc008] = 0x00;
-    c.mem[0xc009] = 0x60;
-    c.mem[0xc00a] = 0xa9;
-    c.mem[0xc00b] = 0xaa;
-    c.mem[0xc00c] = 0x8d;
-    c.mem[0xc00d] = 0x00;
-    c.mem[0xc00e] = 0x60;
-    c.mem[0xc00f] = 0x4c;
+    c.mem[0xc000] = 0x0f;
+    c.mem[0xc001] = 0x12;
+    c.mem[0xc002] = 0x03;
+    c.mem[0xc003] = 0x4c;
+    c.mem[0xc004] = 0x0b;
+    c.mem[0xc005] = 0xc0;
+    c.mem[0xc006] = 0xea;
+    c.mem[0xc007] = 0x1a;
 
-    c.mem[0xc010] = 0x05;
-    c.mem[0xc011] = 0xc0;
+    c.mem[0xc008] = 0x4c;
+    c.mem[0xc009] = 0x00;
+    c.mem[0xc00a] = 0xc0;
+    c.mem[0xc00b] = 0xea;
+    c.mem[0xc00c] = 0xea;
+    c.mem[0xc00d] = 0x1a;
+    c.mem[0xc00e] = 0x4c;
+    c.mem[0xc00f] = 0x00;
+
+    c.mem[0xc010] = 0xc0;
+
+    // test byte
+    c.mem[0x0012] = 1;
 
     // reset vector
     c.mem[0xfffc] = 0x00;
     c.mem[0xfffd] = 0xc0;
 
 
-    printf ( "%x.%x.%x.%x %x.%x.%x.%x\n", c.a, c.x, c.y, c.flags, c.clockticks, c.ea, c.opcode, c.pc );
+    //printf ( "%x.%x.%x.%x %x.%x.%x.%x\n", c.a, c.x, c.y, c.flags, c.clockticks, c.ea, c.opcode, c.pc );
     reset6502 ( &c );
-    printf ( "\n" );
+    printf ( "start\n" );
     for ( int i; i<100; i++ ) {
         printf ( "%x.%x.%x.%x %x.%x.%x.%x\n", c.a, c.x, c.y, c.flags, c.clockticks, c.ea, c.opcode, c.pc );
         step ( &c );
