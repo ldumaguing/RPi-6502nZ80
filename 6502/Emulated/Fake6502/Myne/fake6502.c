@@ -51,18 +51,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-/* #define NES_CPU
- * when this is defined, the binary-coded decimal (BCD) status flag is not
- * honored by ADC and SBC. the 2A03 CPU in the Nintendo Entertainment System
- * does not support BCD operation.
- */
 #define W65C02
-/* #define NMOS6502
- * #define CMOS6502
- * define one or other of these. This will configure the emulator to emulate
- * either the NMOS or CMOS variants (CMOS adds bugfixes and several
- * instructions)
- */
+#define DECIMALMODE
 
 #define FLAG_CARRY 0x01
 #define FLAG_ZERO 0x02
@@ -252,30 +242,6 @@ static void absy_p ( context_t *c ) { // absolute,Y
 
     c->pc += 2;
 }
-
-#ifdef NMOS6502
-static void ind ( context_t *c ) { // indirect
-    uint16_t eahelp, eahelp2;
-    eahelp = mem_read16 ( c, c->pc );
-    eahelp2 =
-        ( eahelp & 0xFF00 ) |
-        ( ( eahelp + 1 ) & 0x00FF ); // replicate 6502 page-boundary wraparound bug
-    c->ea =
-        ( uint16_t ) mem_read ( c, eahelp ) | ( ( uint16_t ) mem_read ( c, eahelp2 ) << 8 );
-    c->pc += 2;
-}
-#endif
-
-#ifdef CMOS6502
-static void ind ( context_t *c ) { // indirect
-    uint16_t eahelp;
-    eahelp = mem_read16 ( c, c->pc );
-    if ( ( eahelp & 0x00ff ) == 0xff )
-        c->clockticks++;
-    c->ea = mem_read16 ( c, eahelp );
-    c->pc += 2;
-}
-#endif
 
 static void indx ( context_t *c ) { // (indirect,X)
     uint16_t eahelp;
@@ -713,22 +679,6 @@ void sbc ( context_t *c ) {
     overflowcalc ( c, result, c->a, value );
     signcalc ( c, result );
 
-#ifndef NES_CPU
-    if ( c->flags & FLAG_DECIMAL ) {
-        clearcarry ( c );
-
-        if ( ( result & 0x0F ) > 0x09 ) {
-            result -= 0x06;
-        }
-        if ( ( result & 0xF0 ) > 0x90 ) {
-            result -= 0x60;
-            setcarry ( c );
-        }
-
-        c->clockticks++;
-    }
-#endif
-
     saveaccum ( c, result );
 }
 
@@ -864,285 +814,8 @@ void rra ( context_t *c ) {
     saveaccum ( c, add8 ( c, c->a, result, c->flags & FLAG_CARRY ) );
 }
 
-#ifdef NMOS6502
-static opcode_t opcodes[256] = {
-    /* 00 */
-    {imp, brk, 7},
-    {indx, ora, 6},
-    {imp, nop, 2},
-    {indx, slo, 8},
-    {zp, nop, 3},
-    {zp, ora, 3},
-    {zp, asl, 5},
-    {zp, slo, 5},
-    {imp, php, 3},
-    {imm, ora, 2},
-    {acc, asl, 2},
-    {imm, nop, 2},
-    {abso, nop, 4},
-    {abso, ora, 4},
-    {abso, asl, 6},
-    {abso, slo, 6},
-    /* 01 */
-    {rel, bpl, 2},
-    {indy_p, ora, 5},
-    {imp, nop, 2},
-    {indy, slo, 8},
-    {zpx, nop, 4},
-    {zpx, ora, 4},
-    {zpx, asl, 6},
-    {zpx, slo, 6},
-    {imp, clc, 2},
-    {absy_p, ora, 4},
-    {imp, nop, 2},
-    {absy, slo, 7},
-    {absx, nop, 4},
-    {absx_p, ora, 4},
-    {absx, asl, 7},
-    {absx, slo, 7},
-    /* 02 */
-    {abso, jsr, 6},
-    {indx, and, 6},
-    {imp, nop, 2},
-    {indx, rla, 8},
-    {zp, bit, 3},
-    {zp, and, 3},
-    {zp, rol, 5},
-    {zp, rla, 5},
-    {imp, plp, 4},
-    {imm, and, 2},
-    {acc, rol, 2},
-    {imm, nop, 2},
-    {abso, bit, 4},
-    {abso, and, 4},
-    {abso, rol, 6},
-    {abso, rla, 6},
-    /* 30 */
-    {rel, bmi, 2},
-    {indy_p, and, 5},
-    {imp, nop, 2},
-    {indy, rla, 8},
-    {zpx, nop, 4},
-    {zpx, and, 4},
-    {zpx, rol, 6},
-    {zpx, rla, 6},
-    {imp, sec, 2},
-    {absy_p, and, 4},
-    {imp, nop, 2},
-    {absy, rla, 7},
-    {absx, nop, 4},
-    {absx_p, and, 4},
-    {absx, rol, 7},
-    {absx, rla, 7},
-    /* 40 */
-    {imp, rti, 6},
-    {indx, eor, 6},
-    {imp, nop, 2},
-    {indx, sre, 8},
-    {zp, nop, 3},
-    {zp, eor, 3},
-    {zp, lsr, 5},
-    {zp, sre, 5},
-    {imp, pha, 3},
-    {imm, eor, 2},
-    {acc, lsr, 2},
-    {imm, nop, 2},
-    {abso, jmp, 3},
-    {abso, eor, 4},
-    {abso, lsr, 6},
-    {abso, sre, 6},
-    /* 50 */
-    {rel, bvc, 2},
-    {indy_p, eor, 5},
-    {imp, nop, 2},
-    {indy, sre, 8},
-    {zpx, nop, 4},
-    {zpx, eor, 4},
-    {zpx, lsr, 6},
-    {zpx, sre, 6},
-    {imp, cli, 2},
-    {absy_p, eor, 4},
-    {imp, nop, 2},
-    {absy, sre, 7},
-    {absx, nop, 4},
-    {absx_p, eor, 4},
-    {absx, lsr, 7},
-    {absx, sre, 7},
-    /* 60 */
-    {imp, rts, 6},
-    {indx, adc, 6},
-    {imp, nop, 2},
-    {indx, rra, 8},
-    {zp, nop, 3},
-    {zp, adc, 3},
-    {zp, ror, 5},
-    {zp, rra, 5},
-    {imp, pla, 4},
-    {imm, adc, 2},
-    {acc, ror, 2},
-    {imm, nop, 2},
-    {ind, jmp, 5},
-    {abso, adc, 4},
-    {abso, ror, 6},
-    {abso, rra, 6},
-    /* 70 */
-    {rel, bvs, 2},
-    {indy_p, adc, 5},
-    {imp, nop, 2},
-    {indy, rra, 8},
-    {zpx, nop, 4},
-    {zpx, adc, 4},
-    {zpx, ror, 6},
-    {zpx, rra, 6},
-    {imp, sei, 2},
-    {absy_p, adc, 4},
-    {imp, nop, 2},
-    {absy, rra, 7},
-    {absx, nop, 4},
-    {absx_p, adc, 4},
-    {absx, ror, 7},
-    {absx, rra, 7},
-    /* 80*/
-    {imm, nop, 2},
-    {indx, sta, 6},
-    {imm, nop, 2},
-    {indx, sax, 6},
-    {zp, sty, 3},
-    {zp, sta, 3},
-    {zp, stx, 3},
-    {zp, sax, 3},
-    {imp, dey, 2},
-    {imm, nop, 2},
-    {imp, txa, 2},
-    {imm, nop, 2},
-    {abso, sty, 4},
-    {abso, sta, 4},
-    {abso, stx, 4},
-    {abso, sax, 4},
-    /*90*/
-    {rel, bcc, 2},
-    {indy, sta, 6},
-    {imp, nop, 2},
-    {indy, nop, 6},
-    {zpx, sty, 4},
-    {zpx, sta, 4},
-    {zpy, stx, 4},
-    {zpy, sax, 4},
-    {imp, tya, 2},
-    {absy, sta, 5},
-    {imp, txs, 2},
-    {absy, nop, 5},
-    {absx, nop, 5},
-    {absx, sta, 5},
-    {absy, nop, 5},
-    {absy, nop, 5},
-    /* A0 */
-    {imm, ldy, 2},
-    {indx, lda, 6},
-    {imm, ldx, 2},
-    {indx, lax, 6},
-    {zp, ldy, 3},
-    {zp, lda, 3},
-    {zp, ldx, 3},
-    {zp, lax, 3},
-    {imp, tay, 2},
-    {imm, lda, 2},
-    {imp, tax, 2},
-    {imm, nop, 2},
-    {abso, ldy, 4},
-    {abso, lda, 4},
-    {abso, ldx, 4},
-    {abso, lax, 4},
-    /* B0 */
-    {rel, bcs, 2},
-    {indy_p, lda, 5},
-    {imp, nop, 2},
-    {indy_p, lax, 5},
-    {zpx, ldy, 4},
-    {zpx, lda, 4},
-    {zpy, ldx, 4},
-    {zpy, lax, 4},
-    {imp, clv, 2},
-    {absy_p, lda, 4},
-    {imp, tsx, 2},
-    {absy_p, lax, 4},
-    {absx_p, ldy, 4},
-    {absx_p, lda, 4},
-    {absy_p, ldx, 4},
-    {absy_p, lax, 4},
-    /* C0 */
-    {imm, cpy, 2},
-    {indx, cmp, 6},
-    {imm, nop, 2},
-    {indx, dcp, 8},
-    {zp, cpy, 3},
-    {zp, cmp, 3},
-    {zp, dec, 5},
-    {zp, dcp, 5},
-    {imp, iny, 2},
-    {imm, cmp, 2},
-    {imp, dex, 2},
-    {imm, nop, 2},
-    {abso, cpy, 4},
-    {abso, cmp, 4},
-    {abso, dec, 6},
-    {abso, dcp, 6},
-    /* D0 */
-    {rel, bne, 2},
-    {indy_p, cmp, 5},
-    {imp, nop, 2},
-    {indy, dcp, 8},
-    {zpx, nop, 4},
-    {zpx, cmp, 4},
-    {zpx, dec, 6},
-    {zpx, dcp, 6},
-    {imp, cld, 2},
-    {absy_p, cmp, 4},
-    {imp, nop, 2},
-    {absy, dcp, 7},
-    {absx, nop, 4},
-    {absx_p, cmp, 4},
-    {absx, dec, 7},
-    {absx, dcp, 7},
-    /* E0 */
-    {imm, cpx, 2},
-    {indx, sbc, 6},
-    {imm, nop, 2},
-    {indx, isb, 8},
-    {zp, cpx, 3},
-    {zp, sbc, 3},
-    {zp, inc, 5},
-    {zp, isb, 5},
-    {imp, inx, 2},
-    {imm, sbc, 2},
-    {imp, nop, 2},
-    {imm, sbc, 2},
-    {abso, cpx, 4},
-    {abso, sbc, 4},
-    {abso, inc, 6},
-    {abso, isb, 6},
-    /* F0 */
-    {rel, beq, 2},
-    {indy_p, sbc, 5},
-    {imp, nop, 2},
-    {indy, isb, 8},
-    {zpx, nop, 4},
-    {zpx, sbc, 4},
-    {zpx, inc, 6},
-    {zpx, isb, 6},
-    {imp, sed, 2},
-    {absy_p, sbc, 4},
-    {imp, nop, 2},
-    {absy, isb, 7},
-    {absx, nop, 4},
-    {absx_p, sbc, 4},
-    {absx, inc, 7},
-    {absx, isb, 7}
-};
-#endif
-
 #ifdef W65C02
-static void ind ( context_t *c ) { // indirect
+static void ind ( context_t *c ) { // indirect;   (a), used only with jmp
     uint16_t eahelp;
     eahelp = mem_read16 ( c, c->pc );
     if ( ( eahelp & 0x00ff ) == 0xff )
@@ -1151,11 +824,13 @@ static void ind ( context_t *c ) { // indirect
     c->pc += 2;
 }
 
-static void absi ( context_t *c ) { // (absolute)
+/*
+static void absi ( context_t *c ) { // (absolute);  Seems not being used
     c->ea = mem_read16 ( c, c->pc );
     c->ea = mem_read16 ( c, c->ea );
     c->pc += 2;
 }
+*/
 
 static void rel_zp ( context_t *c ) {
     abso ( c );  // two bytes store rel & zp in ea
@@ -1165,12 +840,147 @@ static void rel_zp ( context_t *c ) {
 void bbr0 ( context_t *c ) {
     uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
     uint16_t zp = c->ea & 0x00FF;
-printf("%x,%x\n", rel, zp);
+
     if ( rel & 0x80 ) rel |= 0xFF00;
     c->ea = c->pc + rel;
-printf(" %x\n",c->ea);
+
     if ( ( mem_read ( c, zp ) & 0x01 ) == 0 ) bra ( c );
-printf("  %x\n",mem_read ( c, zp ) & 0x01);
+}
+void bbr1 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x02 ) == 0 ) bra ( c );
+}
+void bbr2 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x04 ) == 0 ) bra ( c );
+}
+void bbr3 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x08 ) == 0 ) bra ( c );
+}
+void bbr4 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x10 ) == 0 ) bra ( c );
+}
+void bbr5 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x20 ) == 0 ) bra ( c );
+}
+void bbr6 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x40 ) == 0 ) bra ( c );
+}
+void bbr7 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x80 ) == 0 ) bra ( c );
+}
+
+void bbs0 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x01 ) == 1 ) bra ( c );
+}
+void bbs1 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x02 ) == 1 ) bra ( c );
+}
+void bbs2 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x04 ) == 1 ) bra ( c );
+}
+void bbs3 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x08 ) == 1 ) bra ( c );
+}
+void bbs4 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x10 ) == 1 ) bra ( c );
+}
+void bbs5 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x20 ) == 1 ) bra ( c );
+}
+void bbs6 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x40 ) == 1 ) bra ( c );
+}
+void bbs7 ( context_t *c ) {
+    uint16_t rel = ( c->ea & 0xFF00 ) >> 8;
+    uint16_t zp = c->ea & 0x00FF;
+
+    if ( rel & 0x80 ) rel |= 0xFF00;
+    c->ea = c->pc + rel;
+
+    if ( ( mem_read ( c, zp ) & 0x80 ) == 1 ) bra ( c );
 }
 
 // **************************************************************************************
@@ -1208,7 +1018,7 @@ static opcode_t opcodes[256] = {
     {abso, trb, 6},
     {absx_p, ora, 4},
     {absx, asl, 7},
-    {absx, slo, 7},
+    {rel_zp, bbr1, 5},  // *******
     /* 02 */
     {abso, jsr, 6},
     {indx, and, 6},
@@ -1225,7 +1035,7 @@ static opcode_t opcodes[256] = {
     {abso, bit, 4},
     {abso, and, 4},
     {abso, rol, 6},
-    {abso, rla, 6},
+    {rel_zp, bbr2, 5},  // *******
     /* 30 */
     {rel, bmi, 2},
     {indy_p, and, 5},
@@ -1242,7 +1052,7 @@ static opcode_t opcodes[256] = {
     {absx_p, bit, 4},
     {absx_p, and, 4},
     {absx, rol, 7},
-    {absx, rla, 7},
+    {rel_zp, bbr3, 5},  // *******
     /* 40 */
     {imp, rti, 6},
     {indx, eor, 6},
@@ -1259,7 +1069,7 @@ static opcode_t opcodes[256] = {
     {abso, jmp, 3},
     {abso, eor, 4},
     {abso, lsr, 6},
-    {abso, sre, 6},
+    {rel_zp, bbr4, 5},  // *******
     /* 50 */
     {rel, bvc, 2},
     {indy_p, eor, 5},
@@ -1276,7 +1086,7 @@ static opcode_t opcodes[256] = {
     {absx, nop, 4},
     {absx_p, eor, 4},
     {absx, lsr, 7},
-    {absx, sre, 7},
+    {rel_zp, bbr5, 5},  // *******
     /* 60 */
     {imp, rts, 6},
     {indx, adc, 6},
@@ -1293,7 +1103,7 @@ static opcode_t opcodes[256] = {
     {ind, jmp, 5},
     {abso, adc, 4},
     {abso, ror, 6},
-    {abso, rra, 6},
+    {rel_zp, bbr6, 5},  // *******
     /* 70 */
     {rel, bvs, 2},
     {indy_p, adc, 5},
@@ -1310,7 +1120,7 @@ static opcode_t opcodes[256] = {
     {absxi, jmp, 6},
     {absx_p, adc, 4},
     {absx, ror, 7},
-    {absx, rra, 7},
+    {rel_zp, bbr7, 5},  // *******
     /* 80 */
     {rel, bra, 3},
     {indx, sta, 6},
@@ -1327,7 +1137,7 @@ static opcode_t opcodes[256] = {
     {abso, sty, 4},
     {abso, sta, 4},
     {abso, stx, 4},
-    {abso, sax, 4},
+    {rel_zp, bbs0, 5},  // *******
     /* 90 */
     {rel, bcc, 2},
     {indy, sta, 6},
@@ -1344,7 +1154,7 @@ static opcode_t opcodes[256] = {
     {abso, stz, 4},
     {absx, sta, 5},
     {absx, stz, 5},
-    {absy, nop, 5},
+    {rel_zp, bbs1, 5},  // *******
     /* A0 */
     {imm, ldy, 2},
     {indx, lda, 6},
@@ -1361,7 +1171,7 @@ static opcode_t opcodes[256] = {
     {abso, ldy, 4},
     {abso, lda, 4},
     {abso, ldx, 4},
-    {abso, lax, 4},
+    {rel_zp, bbs2, 5},  // *******
     /* B0 */
     {rel, bcs, 2},
     {indy_p, lda, 5},
@@ -1378,7 +1188,7 @@ static opcode_t opcodes[256] = {
     {absx_p, ldy, 4},
     {absx_p, lda, 4},
     {absy_p, ldx, 4},
-    {absy_p, lax, 4},
+    {rel_zp, bbs3, 5},  // *******
     /* C0 */
     {imm, cpy, 2},
     {indx, cmp, 6},
@@ -1395,7 +1205,7 @@ static opcode_t opcodes[256] = {
     {abso, cpy, 4},
     {abso, cmp, 4},
     {abso, dec, 6},
-    {abso, dcp, 6},
+    {rel_zp, bbs4, 5},  // *******
     /* D0 */
     {rel, bne, 2},
     {indy_p, cmp, 5},
@@ -1412,7 +1222,7 @@ static opcode_t opcodes[256] = {
     {absx, nop, 4},
     {absx_p, cmp, 4},
     {absx, dec, 7},
-    {absx, dcp, 7},
+    {rel_zp, bbs5, 5},  // *******
     /* E0 */
     {imm, cpx, 2},
     {indx, sbc, 6},
@@ -1429,7 +1239,7 @@ static opcode_t opcodes[256] = {
     {abso, cpx, 4},
     {abso, sbc, 4},
     {abso, inc, 6},
-    {abso, isb, 6},
+    {rel_zp, bbs6, 5},  // *******
     /* F0 */
     {rel, beq, 2},
     {indy_p, sbc, 5},
@@ -1446,287 +1256,10 @@ static opcode_t opcodes[256] = {
     {absx, nop, 4},
     {absx_p, sbc, 4},
     {absx, inc, 7},
-    {absx, isb, 7}
+    {rel_zp, bbs7, 5},  // *******
 };
 #endif
 
-
-#ifdef CMOS6502
-static opcode_t opcodes[256] = {
-    /* 00 */
-    {imp, brk, 7},
-    {indx, ora, 6},
-    {imp, nop, 2},
-    {indx, slo, 8},
-    {zp, tsb, 5},
-    {zp, ora, 3},
-    {zp, asl, 5},
-    {zp, slo, 5},
-    {imp, php, 3},
-    {imm, ora, 2},
-    {acc, asl, 2},
-    {imm, nop, 2},
-    {abso, tsb, 6},
-    {abso, ora, 4},
-    {abso, asl, 6},
-    {abso, slo, 6},
-    /* 01 */
-    {rel, bpl, 2},
-    {indy_p, ora, 5},
-    {zpi, ora, 5},
-    {indy, slo, 8},
-    {zp, trb, 5},
-    {zpx, ora, 4},
-    {zpx, asl, 6},
-    {zpx, slo, 6},
-    {imp, clc, 2},
-    {absy_p, ora, 4},
-    {acc, inc, 2},
-    {absy, slo, 7},
-    {abso, trb, 6},
-    {absx_p, ora, 4},
-    {absx, asl, 7},
-    {absx, slo, 7},
-    /* 02 */
-    {abso, jsr, 6},
-    {indx, and, 6},
-    {imp, nop, 2},
-    {indx, rla, 8},
-    {zp, bit, 3},
-    {zp, and, 3},
-    {zp, rol, 5},
-    {zp, rla, 5},
-    {imp, plp, 4},
-    {imm, and, 2},
-    {acc, rol, 2},
-    {imm, nop, 2},
-    {abso, bit, 4},
-    {abso, and, 4},
-    {abso, rol, 6},
-    {abso, rla, 6},
-    /* 30 */
-    {rel, bmi, 2},
-    {indy_p, and, 5},
-    {zpi, adc, 5},
-    {indy, rla, 8},
-    {zpx, bit, 4},
-    {zpx, and, 4},
-    {zpx, rol, 6},
-    {zpx, rla, 6},
-    {imp, sec, 2},
-    {absy_p, and, 4},
-    {acc, dec, 2},
-    {absy, rla, 7},
-    {absx_p, bit, 4},
-    {absx_p, and, 4},
-    {absx, rol, 7},
-    {absx, rla, 7},
-    /* 40 */
-    {imp, rti, 6},
-    {indx, eor, 6},
-    {imp, nop, 2},
-    {indx, sre, 8},
-    {zp, nop, 3},
-    {zp, eor, 3},
-    {zp, lsr, 5},
-    {zp, sre, 5},
-    {imp, pha, 3},
-    {imm, eor, 2},
-    {acc, lsr, 2},
-    {imm, nop, 2},
-    {abso, jmp, 3},
-    {abso, eor, 4},
-    {abso, lsr, 6},
-    {abso, sre, 6},
-    /* 50 */
-    {rel, bvc, 2},
-    {indy_p, eor, 5},
-    {zpi, eor, 5},
-    {indy, sre, 8},
-    {zpx, nop, 4},
-    {zpx, eor, 4},
-    {zpx, lsr, 6},
-    {zpx, sre, 6},
-    {imp, cli, 2},
-    {absy_p, eor, 4},
-    {imp, phy, 2},
-    {absy, sre, 7},
-    {absx, nop, 4},
-    {absx_p, eor, 4},
-    {absx, lsr, 7},
-    {absx, sre, 7},
-    /* 60 */
-    {imp, rts, 6},
-    {indx, adc, 6},
-    {imp, nop, 2},
-    {indx, rra, 8},
-    {zp, stz, 3},
-    {zp, adc, 3},
-    {zp, ror, 5},
-    {zp, rra, 5},
-    {imp, pla, 4},
-    {imm, adc, 2},
-    {acc, ror, 2},
-    {imm, nop, 2},
-    {ind, jmp, 5},
-    {abso, adc, 4},
-    {abso, ror, 6},
-    {abso, rra, 6},
-    /* 70 */
-    {rel, bvs, 2},
-    {indy_p, adc, 5},
-    {zpi, adc, 5},
-    {indy, rra, 8},
-    {zpx, stz, 4},
-    {zpx, adc, 4},
-    {zpx, ror, 6},
-    {zpx, rra, 6},
-    {imp, sei, 2},
-    {absy_p, adc, 4},
-    {imp, ply, 6},
-    {absy, rra, 7},
-    {absxi, jmp, 6},
-    {absx_p, adc, 4},
-    {absx, ror, 7},
-    {absx, rra, 7},
-    /* 80 */
-    {rel, bra, 3},
-    {indx, sta, 6},
-    {imm, nop, 2},
-    {indx, sax, 6},
-    {zp, sty, 3},
-    {zp, sta, 3},
-    {zp, stx, 3},
-    {zp, sax, 3},
-    {imp, dey, 2},
-    {imm, bit_imm, 2},
-    {imp, txa, 2},
-    {imm, nop, 2},
-    {abso, sty, 4},
-    {abso, sta, 4},
-    {abso, stx, 4},
-    {abso, sax, 4},
-    /* 90 */
-    {rel, bcc, 2},
-    {indy, sta, 6},
-    {zpi, sta, 5},
-    {indy, nop, 6},
-    {zpx, sty, 4},
-    {zpx, sta, 4},
-    {zpy, stx, 4},
-    {zpy, sax, 4},
-    {imp, tya, 2},
-    {absy, sta, 5},
-    {imp, txs, 2},
-    {absy, nop, 5},
-    {abso, stz, 4},
-    {absx, sta, 5},
-    {absx, stz, 5},
-    {absy, nop, 5},
-    /* A0 */
-    {imm, ldy, 2},
-    {indx, lda, 6},
-    {imm, ldx, 2},
-    {indx, lax, 6},
-    {zp, ldy, 3},
-    {zp, lda, 3},
-    {zp, ldx, 3},
-    {zp, lax, 3},
-    {imp, tay, 2},
-    {imm, lda, 2},
-    {imp, tax, 2},
-    {imm, nop, 2},
-    {abso, ldy, 4},
-    {abso, lda, 4},
-    {abso, ldx, 4},
-    {abso, lax, 4},
-    /* B0 */
-    {rel, bcs, 2},
-    {indy_p, lda, 5},
-    {zpi, lda, 5},
-    {indy_p, lax, 5},
-    {zpx, ldy, 4},
-    {zpx, lda, 4},
-    {zpy, ldx, 4},
-    {zpy, lax, 4},
-    {imp, clv, 2},
-    {absy_p, lda, 4},
-    {imp, tsx, 2},
-    {absy_p, lax, 4},
-    {absx_p, ldy, 4},
-    {absx_p, lda, 4},
-    {absy_p, ldx, 4},
-    {absy_p, lax, 4},
-    /* C0 */
-    {imm, cpy, 2},
-    {indx, cmp, 6},
-    {imm, nop, 2},
-    {indx, dcp, 8},
-    {zp, cpy, 3},
-    {zp, cmp, 3},
-    {zp, dec, 5},
-    {zp, dcp, 5},
-    {imp, iny, 2},
-    {imm, cmp, 2},
-    {imp, dex, 2},
-    {imm, nop, 2},
-    {abso, cpy, 4},
-    {abso, cmp, 4},
-    {abso, dec, 6},
-    {abso, dcp, 6},
-    /* D0 */
-    {rel, bne, 2},
-    {indy_p, cmp, 5},
-    {zpi, cmp, 5},
-    {indy, dcp, 8},
-    {zpx, nop, 4},
-    {zpx, cmp, 4},
-    {zpx, dec, 6},
-    {zpx, dcp, 6},
-    {imp, cld, 2},
-    {absy_p, cmp, 4},
-    {imp, phx, 3},
-    {absy, dcp, 7},
-    {absx, nop, 4},
-    {absx_p, cmp, 4},
-    {absx, dec, 7},
-    {absx, dcp, 7},
-    /* E0 */
-    {imm, cpx, 2},
-    {indx, sbc, 6},
-    {imm, nop, 2},
-    {indx, isb, 8},
-    {zp, cpx, 3},
-    {zp, sbc, 3},
-    {zp, inc, 5},
-    {zp, isb, 5},
-    {imp, inx, 2},
-    {imm, sbc, 2},
-    {imp, nop, 2},
-    {imm, sbc, 2},
-    {abso, cpx, 4},
-    {abso, sbc, 4},
-    {abso, inc, 6},
-    {abso, isb, 6},
-    /* F0 */
-    {rel, beq, 2},
-    {indy_p, sbc, 5},
-    {zpi, sbc, 5},
-    {indy, isb, 8},
-    {zpx, nop, 4},
-    {zpx, sbc, 4},
-    {zpx, inc, 6},
-    {zpx, isb, 6},
-    {imp, sed, 2},
-    {absy_p, sbc, 4},
-    {imp, plx, 2},
-    {absy, isb, 7},
-    {absx, nop, 4},
-    {absx_p, sbc, 4},
-    {absx, inc, 7},
-    {absx, isb, 7}
-};
-#endif
 
 void nmi6502 ( context_t *c ) {
     push6502_16 ( c, c->pc );

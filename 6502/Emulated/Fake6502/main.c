@@ -44,7 +44,7 @@ int main ( int argc, char *argv[] ) {
     c.mem[0xc010] = 0xc0;
 
     // test byte
-    c.mem[0x0012] = 0;
+    c.mem[0x0012] = 1;
 
     // reset vector
     c.mem[0xfffc] = 0x00;
