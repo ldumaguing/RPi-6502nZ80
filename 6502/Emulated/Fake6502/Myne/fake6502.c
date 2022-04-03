@@ -983,6 +983,12 @@ void bbs7 ( context_t *c ) {
     if ( ( mem_read ( c, zp ) & 0x80 ) == 1 ) bra ( c );
 }
 
+// **********
+void rmb0 ( context_t *c ) {
+    //printf("> %x\n", mem_read(c, c->ea) & 0x0e);
+    mem_write ( c, c->ea, mem_read ( c, c->ea ) & 0x0e );
+}
+
 // **************************************************************************************
 static opcode_t opcodes[256] = {
     /* 00 */
@@ -993,7 +999,7 @@ static opcode_t opcodes[256] = {
     {zp, tsb, 5},
     {zp, ora, 3},
     {zp, asl, 5},
-    {zp, slo, 5},
+    {zp, rmb0, 5},  // *******
     {imp, php, 3},
     {imm, ora, 2},
     {acc, asl, 2},
