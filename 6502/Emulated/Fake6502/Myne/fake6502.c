@@ -211,9 +211,10 @@ static void absx_p ( context_t *c ) { // absolute,X with cycle penalty
     c->ea = mem_read16 ( c, c->pc );
     startpage = c->ea & 0xFF00;
     c->ea += ( uint16_t ) c->x;
+#ifdef USECLOCKTICKS
     if ( startpage != ( c->ea & 0xff00 ) )
         c->clockticks++;
-
+#endif
     c->pc += 2;
 }
 
@@ -237,9 +238,10 @@ static void absy_p ( context_t *c ) { // absolute,Y
     c->ea = mem_read16 ( c, c->pc );
     startpage = c->ea & 0xFF00;
     c->ea += ( uint16_t ) c->y;
+#ifdef USECLOCKTICKS
     if ( startpage != ( c->ea & 0xff00 ) )
         c->clockticks++;
-
+#endif
     c->pc += 2;
 }
 
@@ -270,8 +272,10 @@ static void indy_p ( context_t *c ) { // (indirect),Y
         ( uint16_t ) mem_read ( c, eahelp ) | ( ( uint16_t ) mem_read ( c, eahelp2 ) << 8 );
     startpage = c->ea & 0xFF00;
     c->ea += ( uint16_t ) c->y;
+#ifdef USECLOCKTICKS
     if ( startpage != ( c->ea & 0xff00 ) )
         c->clockticks++;
+#endif
 }
 
 static void zpi ( context_t *c ) { // (zp)
@@ -316,8 +320,9 @@ uint8_t add8 ( context_t *c, uint16_t a, uint16_t b, bool carry ) {
             result += 0x60;
             setcarry ( c );
         }
-
+#ifdef USECLOCKTICKS
         c->clockticks++;
+#endif
     }
 #endif
     return result;
@@ -402,10 +407,12 @@ void asl ( context_t *c ) {
 void bra ( context_t *c ) {
     uint16_t oldpc = c->pc;
     c->pc = c->ea;
+#ifdef USECLOCKTICKS
     if ( ( oldpc & 0xFF00 ) != ( c->pc & 0xFF00 ) )
         c->clockticks += 2; // check if jump crossed a page boundary
     else
         c->clockticks++;
+#endif
 }
 
 void bcc ( context_t *c ) {
@@ -818,8 +825,10 @@ void rra ( context_t *c ) {
 static void ind ( context_t *c ) { // indirect;   (a), used only with jmp
     uint16_t eahelp;
     eahelp = mem_read16 ( c, c->pc );
+#ifdef USECLOCKTICKS
     if ( ( eahelp & 0x00ff ) == 0xff )
         c->clockticks++;
+#endif
     c->ea = mem_read16 ( c, eahelp );
     c->pc += 2;
 }
@@ -1334,5 +1343,7 @@ void step ( context_t *c ) {
 
     opcodes[opcode].addr_mode ( c );
     opcodes[opcode].opcode ( c );
+#ifdef USECLOCKTICKS
     c->clockticks += opcodes[opcode].clockticks;
+#endif
 }
