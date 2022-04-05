@@ -12,49 +12,35 @@ uint8_t mem_read ( context_t *c, uint16_t addr ) {
     return c->mem[addr];
 }
 
+#define ROM_size 16384
 
+// **************************************************************************************
 int main ( int argc, char *argv[] ) {
     context_t c;
-
-    c.mem[0xc000] = 0x4c;
-    c.mem[0xc001] = 0x07;
-    c.mem[0xc002] = 0xc0;
-    c.mem[0xc003] = 0xea;
-    c.mem[0xc004] = 0x4c;
-    c.mem[0xc005] = 0x00;
-    c.mem[0xc006] = 0xc0;
-    c.mem[0xc007] = 0x0f;
-
-    c.mem[0xc008] = 0x12;
-    c.mem[0xc009] = 0xf9;
-    c.mem[0xc00a] = 0xea;
-    c.mem[0xc00b] = 0xea;
-    c.mem[0xc00c] = 0x4c;
-    c.mem[0xc00d] = 0x00;
-    c.mem[0xc00e] = 0xc0;
-//    c.mem[0xc00f] = 0x00;
-    /*
-        c.mem[0xc010] = 0xc0;
-    */
-
-    // test byte
-    c.mem[0x0012] = 12;
+    uint8_t *ROM = &c.mem[0xc000];
+   
+    FILE* fp;
+    if (argc < 2)
+        fp = fopen ( "rom.bin", "rb" );
+    else
+        fp = fopen ( argv[1], "rb" );
+    fread ( ROM, ROM_size, 1, fp );
+    fclose ( fp );
 
     // reset vector
     c.mem[0xfffc] = 0x00;
     c.mem[0xfffd] = 0xc0;
 
-    printf ( ".>>>>>>>>>>> %x\n", c.mem[0x0012] );
-    //printf ( "%x.%x.%x.%x %x.%x.%x.%x\n", c.a, c.x, c.y, c.flags, c.clockticks, c.ea, c.opcode, c.pc );
+
+
+
     reset6502 ( &c );
     printf ( "start\n" );
-    for ( int i; i<20; i++ ) {
-        printf ( "%x.%x.%x.%x %x.%x.%x.%x\n", c.a, c.x, c.y, c.flags, c.clockticks, c.ea, c.opcode, c.pc );
+    for ( ;; ) {
+        printf ( "%x.%x.%x.%x %x.%x.%x\n", c.a, c.x, c.y, c.flags, c.pc, c.opcode, c.ea );
         step ( &c );
     }
-    printf ( "%x.%x.%x.%x %x.%x.%x.%x\n", c.a, c.x, c.y, c.flags, c.clockticks, c.ea, c.opcode, c.pc );
-    printf ( "%x.%x\n", c.mem[0xfffc], c.mem[0xfffd] );
 
-    printf ( ">>>>>>>>>>> %x\n", c.mem[0x0012] );
+
     return 0;
 }
