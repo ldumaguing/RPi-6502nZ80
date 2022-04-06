@@ -61,6 +61,7 @@
 
 #define W65C02S
 #define DECIMALMODE
+#define USECLOCKTICKS
 /* #define NMOS6502
  * #define CMOS6502
  * define one or other of these. This will configure the emulator to emulate
