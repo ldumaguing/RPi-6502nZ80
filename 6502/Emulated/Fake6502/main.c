@@ -36,16 +36,14 @@ int main ( int argc, char *argv[] ) {
 
     reset6502 ( &c );
     printf ( "start\n" );
-    int ticks = 0;
     for ( ;; ) {
-        ticks = c.clockticks;
         printf ( "%x ", c.pc );
         step ( &c );
         printf ( "%02x", c.opcode );
         // printf ( "%x.%x.%x.%x %x.%x.%x", c.a, c.x, c.y, c.flags, c.pc, c.opcode, c.ea );
 
-        printf ( " %d\n", c.clockticks - ticks );
-        ticks = 0;
+        printf ( " %d\n", c.clockticks );
+        c.clockticks = 0;
         
         /*
             while ( c.clockticks > 0 ) {
