@@ -46,6 +46,17 @@ int main ( int argc, char *argv[] ) {
 
         printf ( " %d\n", c.clockticks - ticks );
         ticks = 0;
+        
+        /*
+            while ( c.clockticks > 0 ) {
+            printf ( ".\n" );
+            c.clockticks--;
+        }
+        */
+        
+        
+        
+        
     }
 
 
