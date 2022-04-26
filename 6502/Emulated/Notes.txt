@@ -1,0 +1,5 @@
+Compiling using CC65:
+   ca65   --cpu 65C02   fish.asm
+   ld65   -t none   -o fish   fish.o
+   
+   
